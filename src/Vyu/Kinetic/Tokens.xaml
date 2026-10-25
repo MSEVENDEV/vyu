@@ -1,0 +1,120 @@
+<!--
+  KINETIC DESIGN SYSTEM · tokens
+  Shared by Hypt and Vyu. Only the two accent colors differ per product.
+  Full sheet: docs/design.html · DESIGN.md
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <!-- Surfaces: five steps of charcoal, built around the brand #1E1E24 -->
+    <Color x:Key="K.Bg0">#141418</Color>
+    <Color x:Key="K.Bg1">#1E1E24</Color>
+    <Color x:Key="K.Bg2">#25252C</Color>
+    <Color x:Key="K.Bg3">#2E2E36</Color>
+    <Color x:Key="K.Bg4">#393942</Color>
+    <Color x:Key="K.Line">#14FFFFFF</Color>
+    <Color x:Key="K.Line2">#26FFFFFF</Color>
+
+    <!-- Text -->
+    <Color x:Key="K.Text1">#F5F5F7</Color>
+    <Color x:Key="K.Text2">#B4B4C0</Color>
+    <Color x:Key="K.Text3">#8A8A96</Color>
+    <Color x:Key="K.Text4">#5C5C68</Color>
+
+    <!-- Product accent (Vyu: Amethyst → Lilac, with white) -->
+    <Color x:Key="K.Accent1">#7C3AED</Color>
+    <Color x:Key="K.Accent2">#B07CFF</Color>
+    <Color x:Key="K.AccentSoft">#2E8B5CF6</Color>
+    <Color x:Key="K.AccentGlow">#8B5CF6</Color>
+
+    <!-- Semantic -->
+    <Color x:Key="K.Success">#2EE59D</Color>
+    <Color x:Key="K.Warning">#FFC23D</Color>
+    <Color x:Key="K.Danger">#FF4D5E</Color>
+    <Color x:Key="K.Info">#4DA3FF</Color>
+    <Color x:Key="K.Live">#FF2E4D</Color>
+
+    <SolidColorBrush x:Key="K.Bg0Brush" Color="{StaticResource K.Bg0}" />
+    <SolidColorBrush x:Key="K.Bg1Brush" Color="{StaticResource K.Bg1}" />
+    <SolidColorBrush x:Key="K.Bg2Brush" Color="{StaticResource K.Bg2}" />
+    <SolidColorBrush x:Key="K.Bg3Brush" Color="{StaticResource K.Bg3}" />
+    <SolidColorBrush x:Key="K.Bg4Brush" Color="{StaticResource K.Bg4}" />
+    <SolidColorBrush x:Key="K.LineBrush" Color="{StaticResource K.Line}" />
+    <SolidColorBrush x:Key="K.Line2Brush" Color="{StaticResource K.Line2}" />
+    <SolidColorBrush x:Key="K.Text1Brush" Color="{StaticResource K.Text1}" />
+    <SolidColorBrush x:Key="K.Text2Brush" Color="{StaticResource K.Text2}" />
+    <SolidColorBrush x:Key="K.Text3Brush" Color="{StaticResource K.Text3}" />
+    <SolidColorBrush x:Key="K.Text4Brush" Color="{StaticResource K.Text4}" />
+    <SolidColorBrush x:Key="K.Accent1Brush" Color="{StaticResource K.Accent1}" />
+    <SolidColorBrush x:Key="K.Accent2Brush" Color="{StaticResource K.Accent2}" />
+    <SolidColorBrush x:Key="K.AccentSoftBrush" Color="{StaticResource K.AccentSoft}" />
+    <SolidColorBrush x:Key="K.SuccessBrush" Color="{StaticResource K.Success}" />
+    <SolidColorBrush x:Key="K.WarningBrush" Color="{StaticResource K.Warning}" />
+    <SolidColorBrush x:Key="K.DangerBrush" Color="{StaticResource K.Danger}" />
+    <SolidColorBrush x:Key="K.InfoBrush" Color="{StaticResource K.Info}" />
+    <SolidColorBrush x:Key="K.LiveBrush" Color="{StaticResource K.Live}" />
+    <SolidColorBrush x:Key="K.ScrimBrush" Color="#B80C0C10" />
+
+    <LinearGradientBrush x:Key="K.AccentGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="{StaticResource K.Accent1}" Offset="0" />
+        <GradientStop Color="{StaticResource K.Accent2}" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="K.AccentGradientH" StartPoint="0,0.5" EndPoint="1,0.5">
+        <GradientStop Color="{StaticResource K.Accent1}" Offset="0" />
+        <GradientStop Color="{StaticResource K.Accent2}" Offset="1" />
+    </LinearGradientBrush>
+    <!-- The "aurora" that glows behind hero areas -->
+    <RadialGradientBrush x:Key="K.Aurora" Center="0.18,0.0" GradientOrigin="0.18,0.0" RadiusX="0.75" RadiusY="0.9">
+        <GradientStop Color="#387C3AED" Offset="0" />
+        <GradientStop Color="#14B07CFF" Offset="0.45" />
+        <GradientStop Color="#00000000" Offset="1" />
+    </RadialGradientBrush>
+    <LinearGradientBrush x:Key="K.CardSheen" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#0DFFFFFF" Offset="0" />
+        <GradientStop Color="#00FFFFFF" Offset="0.5" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="K.ThumbShade" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#00000000" Offset="0.45" />
+        <GradientStop Color="#B3000000" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- Type -->
+    <FontFamily x:Key="K.Font">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="K.FontDisplay">Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="K.FontMono">Cascadia Mono, Consolas</FontFamily>
+    <FontFamily x:Key="K.Icons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+    <sys:Double x:Key="K.Size.Display">38</sys:Double>
+    <sys:Double x:Key="K.Size.H1">26</sys:Double>
+    <sys:Double x:Key="K.Size.H2">20</sys:Double>
+    <sys:Double x:Key="K.Size.H3">16</sys:Double>
+    <sys:Double x:Key="K.Size.Body">14</sys:Double>
+    <sys:Double x:Key="K.Size.Caption">12.5</sys:Double>
+    <sys:Double x:Key="K.Size.Micro">11</sys:Double>
+
+    <!-- Shape -->
+    <CornerRadius x:Key="K.Radius.XS">6</CornerRadius>
+    <CornerRadius x:Key="K.Radius.S">10</CornerRadius>
+    <CornerRadius x:Key="K.Radius.M">14</CornerRadius>
+    <CornerRadius x:Key="K.Radius.L">20</CornerRadius>
+    <CornerRadius x:Key="K.Radius.XL">28</CornerRadius>
+    <CornerRadius x:Key="K.Radius.Pill">999</CornerRadius>
+
+    <!-- Motion: durations -->
+    <Duration x:Key="K.Instant">0:0:0.09</Duration>
+    <Duration x:Key="K.Fast">0:0:0.16</Duration>
+    <Duration x:Key="K.Base">0:0:0.24</Duration>
+    <Duration x:Key="K.Slow">0:0:0.36</Duration>
+    <Duration x:Key="K.Deliberate">0:0:0.52</Duration>
+
+    <!-- Motion: curves. "Out" ≈ cubic-bezier(.16,1,.3,1) — fast start, long soft landing -->
+    <ExponentialEase x:Key="K.EaseOut" EasingMode="EaseOut" Exponent="6" />
+    <CubicEase x:Key="K.EaseInOut" EasingMode="EaseInOut" />
+    <BackEase x:Key="K.EaseSpring" EasingMode="EaseOut" Amplitude="0.35" />
+    <CubicEase x:Key="K.EaseIn" EasingMode="EaseIn" />
+
+    <!-- Elevation -->
+    <DropShadowEffect x:Key="K.Shadow1" BlurRadius="14" ShadowDepth="2" Direction="270" Opacity="0.35" Color="Black" />
+    <DropShadowEffect x:Key="K.Shadow2" BlurRadius="32" ShadowDepth="8" Direction="270" Opacity="0.5" Color="Black" />
+    <DropShadowEffect x:Key="K.Glow" BlurRadius="28" ShadowDepth="0" Opacity="0.55" Color="{StaticResource K.AccentGlow}" />
+</ResourceDictionary>

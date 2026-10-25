@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>Vyu</AssemblyName>
+    <RootNamespace>Vyu</RootNamespace>
+    <ApplicationIcon>Assets\vyu.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>1.0.0</Version>
+    <Product>Vyu</Product>
+    <Company>Vyu</Company>
+    <Description>Vyu — the video player that gets out of the way.</Description>
+    <Copyright>GPL-3.0</Copyright>
+    <NoWarn>$(NoWarn);CA1416;WFAC010</NoWarn>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <!-- WinForms is only used for Screen + dialogs; keep its types out of the global namespace. -->
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <Using Include="System.IO" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\vyu.ico" />
+    <Resource Include="Assets\vyu-mark.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\deps\mpv\libmpv-2.dll" Link="libmpv-2.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" Condition="Exists('..\..\deps\mpv\libmpv-2.dll')" />
+  </ItemGroup>
+
+</Project>

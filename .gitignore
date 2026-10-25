@@ -1,0 +1,10 @@
+bin/
+obj/
+out/
+dist/
+*.user
+*.suo
+.vs/
+deps/
+*.zip
+*.log

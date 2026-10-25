@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en" data-product="vyu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kinetic Design System</title>
+<meta name="description" content="Kinetic — the dark-first, motion-first design system behind Hypt and Vyu: tokens, motion, components and brand.">
+<link rel="icon" href="assets/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#141418;--bg1:#1E1E24;--bg2:#25252C;--bg3:#2E2E36;--bg4:#393942;
+  --line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.15);
+  --t1:#F5F5F7;--t2:#B4B4C0;--t3:#8A8A96;--t4:#5C5C68;
+  --ok:#2EE59D;--warn:#FFC23D;--bad:#FF4D5E;--info:#4DA3FF;--live:#FF2E4D;
+  --a1:#FF4500;--a2:#FF6F59;--glow:255,69,0;
+  --grad:linear-gradient(135deg,var(--a1),var(--a2));--gradh:linear-gradient(90deg,var(--a1),var(--a2));
+  --out:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.34,1.56,.64,1);--inout:cubic-bezier(.65,0,.35,1);
+  --font:"Segoe UI Variable Text","Segoe UI",Inter,system-ui,sans-serif;
+  --display:"Segoe UI Variable Display","Segoe UI",Inter,system-ui,sans-serif;
+  --mono:"Cascadia Mono","JetBrains Mono",Consolas,monospace;
+  --icons:"Segoe Fluent Icons","Segoe MDL2 Assets";
+}
+html[data-product="vyu"]{--a1:#7C3AED;--a2:#B07CFF;--glow:139,92,246}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--bg0)}
+body{margin:0;background:var(--bg0);color:var(--t1);font:15px/1.6 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--a1);color:#fff}
+a{color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.aurora{position:absolute;inset:0 0 auto 0;height:900px;pointer-events:none;background:
+  radial-gradient(50% 60% at 15% 0%,color-mix(in srgb,var(--a1) 28%,transparent),transparent 70%),
+  radial-gradient(40% 50% at 85% 10%,color-mix(in srgb,var(--a2) 20%,transparent),transparent 70%);transition:background .6s}
+/* nav */
+nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(16px);background:rgba(20,20,24,.8);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:22px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font:700 18px var(--display);text-decoration:none}
+.brand .dot{width:26px;height:26px;border-radius:8px;background:var(--grad);box-shadow:0 0 24px rgba(var(--glow),.5)}
+nav .links{display:flex;gap:18px;margin-left:12px;overflow-x:auto;scrollbar-width:none}
+nav .links a{color:var(--t2);text-decoration:none;font-size:13.5px;font-weight:500;white-space:nowrap}
+nav .links a:hover{color:var(--t1)}
+.grow{flex:1}
+.seg{display:inline-flex;padding:3px;border-radius:12px;background:var(--bg1);border:1px solid var(--line)}
+.seg button{all:unset;cursor:pointer;padding:6px 14px;border-radius:9px;font-size:13px;font-weight:600;color:var(--t2);transition:all .24s var(--out)}
+.seg button.on{background:var(--bg4);color:var(--t1);box-shadow:inset 0 0 0 1px var(--line2)}
+/* hero */
+header{position:relative;padding:96px 0 64px}
+.overline{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--a1)}
+h1{font:800 clamp(56px,10vw,120px)/.95 var(--display);letter-spacing:-.045em;margin:14px 0 0}
+.gt{background:var(--gradh);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:19px;color:var(--t2);max-width:640px;margin-top:22px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--bg2);border:1px solid var(--line);font-size:12.5px;color:var(--t2);margin-top:26px;margin-right:6px}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(46,229,157,.6);animation:pulse 1.6s infinite}
+@keyframes pulse{to{box-shadow:0 0 0 10px rgba(46,229,157,0)}}
+section{padding:72px 0;border-top:1px solid var(--line);position:relative}
+h2{font:700 34px/1.15 var(--display);letter-spacing:-.025em;margin:8px 0 10px}
+.sub{color:var(--t2);max-width:700px;margin:0 0 34px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.g6{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:20px;padding:22px;position:relative;overflow:hidden}
+.card h3{margin:0 0 6px;font:600 17px var(--display)}
+.card p{margin:0;color:var(--t2);font-size:14px}
+.num{font:700 13px var(--mono);color:var(--a1)}
+/* swatches */
+.sw{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--bg2);cursor:pointer;transition:transform .24s var(--out),border-color .2s}
+.sw:hover{transform:translateY(-3px);border-color:var(--line2)}
+.sw .c{height:92px}
+.sw .m{padding:10px 12px}
+.sw b{display:block;font-size:13px}
+.sw code{font:12px var(--mono);color:var(--t3)}
+.gradtile{height:200px;border-radius:24px;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;position:relative;overflow:hidden}
+.gradtile b{font:700 24px var(--display)}
+.gradtile code{font:12.5px var(--mono);opacity:.85}
+.gradtile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.2),transparent 60%)}
+/* type */
+.spec{display:flex;align-items:baseline;gap:24px;padding:16px 0;border-bottom:1px solid var(--line)}
+.spec .meta{width:170px;flex:none;font:12px var(--mono);color:var(--t3)}
+/* scales */
+.bar{height:14px;border-radius:4px;background:var(--grad);opacity:.85}
+.radius{height:96px;background:var(--bg3);border:1px solid var(--line2);display:grid;place-items:center;font:12px var(--mono);color:var(--t2)}
+.elev{height:110px;border-radius:18px;background:var(--bg3);display:grid;place-items:center;font:12px var(--mono);color:var(--t2)}
+/* motion */
+.curve{background:var(--bg1);border-radius:14px;border:1px solid var(--line)}
+.stage{height:120px;border-radius:16px;background:var(--bg1);border:1px dashed var(--line2);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px}
+.blob{width:54px;height:54px;border-radius:16px;background:var(--grad);box-shadow:0 8px 30px rgba(var(--glow),.45)}
+.track{position:absolute;left:16px;right:16px;top:50%;height:2px;background:var(--line)}
+.runner{position:absolute;left:16px;top:calc(50% - 9px);width:18px;height:18px;border-radius:50%;background:#fff}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;font-weight:600;font-size:14px;color:var(--t1);background:var(--bg3);border:1px solid var(--line);transition:transform .36s var(--spring),background .16s,box-shadow .24s;position:relative;user-select:none}
+.btn:hover{background:#393942}
+.btn:active{transform:scale(.95);transition:transform .09s linear}
+.btn.primary{background:var(--grad);border:0;color:#fff;height:44px;padding:0 20px;box-shadow:0 0 26px rgba(var(--glow),.45)}
+.btn.primary:hover{box-shadow:0 0 36px rgba(var(--glow),.65);filter:brightness(1.06)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--t2)}
+.btn.ghost:hover{background:rgba(255,255,255,.07);color:var(--t1)}
+.btn.danger{background:rgba(255,77,94,.15);border-color:rgba(255,77,94,.25);color:#FF7A87}
+.btn.icon{width:38px;padding:0;font-family:var(--icons);font-weight:400}
+.toggle{width:44px;height:24px;border-radius:12px;background:var(--bg4);border:1px solid var(--line2);position:relative;cursor:pointer;transition:background .24s;flex:none}
+.toggle::before{content:"";position:absolute;inset:-1px;border-radius:12px;background:var(--gradh);opacity:0;transition:opacity .24s}
+.toggle::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:4px;box-shadow:0 1px 6px rgba(0,0,0,.35);transition:transform .36s var(--spring)}
+.toggle.on::before{opacity:1}
+.toggle.on::after{transform:translateX(20px)}
+.chip{display:inline-flex;padding:7px 14px;border-radius:999px;background:var(--bg2);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--t2);cursor:pointer;transition:all .2s}
+.chip.on{background:var(--t1);color:var(--bg0);border-color:transparent}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--a1),var(--a2)) 0/var(--p,50%) 100% no-repeat,var(--bg4);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 8px rgba(0,0,0,.4),inset 0 0 0 5px #fff,inset 0 0 0 8px var(--a1);cursor:pointer;transition:transform .2s var(--spring)}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:#fff}
+.field{width:100%;height:40px;border-radius:10px;background:var(--bg1);border:1px solid var(--line2);color:var(--t1);padding:0 12px;font:14px var(--font);outline:none;transition:border-color .16s}
+.field:focus{border-color:var(--a1)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.label{font-size:12px;color:var(--t3);margin:18px 0 8px}
+/* clip card demo */
+.clip{border-radius:16px;overflow:hidden;background:var(--bg2);border:1px solid var(--line);transition:transform .24s var(--out),border-color .2s;cursor:pointer}
+.clip:hover{transform:scale(1.025);border-color:var(--line2)}
+.thumb{aspect-ratio:16/9;position:relative;background:linear-gradient(120deg,#ff4500,#ff6f59 40%,#7c3aed 70%,#b07cff);background-size:1000% 100%;background-position:var(--scrub,0%) 0}
+.thumb .dur{position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,.7);font-size:11.5px;font-weight:700;padding:3px 7px;border-radius:7px}
+.thumb .prog{position:absolute;left:0;bottom:0;height:3px;width:var(--scrubw,0);background:var(--gradh)}
+.clip .meta{padding:11px 14px 13px}
+.clip .meta b{font-size:13.5px}
+.clip .meta small{display:block;color:var(--t3);font-size:12px}
+/* seek */
+.seek{position:relative;height:30px;cursor:pointer}
+.seek .t{position:absolute;left:0;right:0;top:13px;height:4px;border-radius:3px;background:rgba(255,255,255,.24);transition:height .16s,top .16s}
+.seek:hover .t{height:6px;top:12px}
+.seek .f{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--gradh);width:38%}
+.seek .bubble{position:absolute;bottom:34px;transform:translateX(-50%);background:var(--bg1);border:1px solid var(--line2);border-radius:12px;padding:5px 5px 4px;opacity:0;transition:opacity .12s;pointer-events:none;text-align:center}
+.seek:hover .bubble{opacity:1}
+.seek .bubble div{width:150px;height:84px;border-radius:8px;background:linear-gradient(120deg,#7c3aed,#b07cff 50%,#ff6f59);background-size:600% 100%;background-position:var(--bp,0%) 0}
+.seek .bubble span{font:600 12px var(--mono)}
+.toast{display:flex;gap:12px;align-items:center;padding:12px;border-radius:18px;background:rgba(30,30,36,.96);border:1px solid var(--line2);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.toast .th{width:96px;height:54px;border-radius:10px;background:linear-gradient(120deg,#ff4500,#ff6f59)}
+.toast b{display:block}
+.toast small{color:var(--t2)}
+.meter{height:5px;border-radius:3px;background:var(--bg4);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--gradh);animation:lvl 1.2s infinite alternate var(--inout)}
+@keyframes lvl{0%{width:12%}35%{width:64%}60%{width:30%}100%{width:82%}}
+.ico{display:grid;place-items:center;height:96px;border-radius:14px;background:var(--bg2);border:1px solid var(--line);text-align:center;gap:2px}
+.ico span{font:22px var(--icons)}
+.ico small{font:11px var(--mono);color:var(--t3)}
+.logo{border-radius:24px;padding:28px;background:var(--bg2);border:1px solid var(--line);display:flex;gap:22px;align-items:center}
+.logo img{width:120px;height:120px;filter:drop-shadow(0 12px 40px rgba(0,0,0,.5))}
+pre{margin:0;background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:18px;overflow:auto;font:12.5px/1.65 var(--mono);color:var(--t2);max-height:420px}
+.tabs{margin-bottom:12px}
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .36s var(--out),transform .52s var(--out)}
+.reveal.in{opacity:1;transform:none}
+.copied{position:fixed;left:50%;bottom:28px;transform:translate(-50%,30px);opacity:0;padding:10px 16px;border-radius:12px;background:var(--bg3);border:1px solid var(--line2);font-weight:600;transition:all .4s var(--out);z-index:50}
+.copied.show{transform:translate(-50%,0);opacity:1}
+footer{padding:48px 0 70px;color:var(--t3);font-size:13px;border-top:1px solid var(--line)}
+@media (max-width:720px){nav .links{display:none}.spec{flex-direction:column;gap:4px}.spec .meta{width:auto}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="dot"></span>Kinetic</a>
+    <div class="links">
+      <a href="#principles">Principles</a><a href="#color">Color</a><a href="#type">Type</a><a href="#space">Space</a>
+      <a href="#motion">Motion</a><a href="#components">Components</a><a href="#icons">Icons</a><a href="#brand">Brand</a><a href="#tokens">Tokens</a>
+    </div>
+    <div class="grow"></div>
+    <div class="seg" role="tablist" aria-label="Product accent">
+      <button data-p="hypt">Hypt</button><button data-p="vyu">Vyu</button>
+    </div>
+  </div>
+</nav>
+
+<header id="top">
+  <div class="aurora"></div>
+  <div class="wrap" style="position:relative">
+    <div class="overline">Design system · v1.0</div>
+    <h1>Kinetic<span class="gt">.</span></h1>
+    <p class="lead">A dark-first, motion-first design system for <b>Hypt</b> and <b>Vyu</b>. One set of tokens, one motion language, two accents. Everything on this page is live — hover it, press it, switch the product above.</p>
+    <span class="pill"><i></i>Implemented in WPF (Tokens.xaml · Controls.xaml · Motion.cs)</span>
+    <span class="pill">Windows 11 native type &amp; icons</span>
+    <span class="pill">Reduced-motion aware</span>
+  </div>
+</header>
+
+<section id="principles">
+  <div class="wrap">
+    <div class="overline">01 · Principles</div>
+    <h2>Five rules everything follows</h2>
+    <p class="sub">When a decision isn't covered by a token, these decide.</p>
+    <div class="grid g3">
+      <div class="card reveal"><span class="num">01</span><h3>Content is loud, chrome is quiet</h3><p>Clips and video carry the color. The interface is near-black glass that steps back.</p></div>
+      <div class="card reveal"><span class="num">02</span><h3>Motion explains</h3><p>Things rise in, presses squash, toggles spring. Nothing animates for more than half a second.</p></div>
+      <div class="card reveal"><span class="num">03</span><h3>One accent per product</h3><p>Hypt is Blaze → Coral (#FF4500 → #FF6F59). Vyu is Amethyst → Lilac with white. Gradients are spice, not sauce.</p></div>
+      <div class="card reveal"><span class="num">04</span><h3>Native and light</h3><p>System fonts and icons, no web view, layers that stop drawing the moment they're hidden.</p></div>
+      <div class="card reveal"><span class="num">05</span><h3>Respect the player</h3><p>Never steal focus from a game, never show up in a clip, honour “animations off”, keep text ≥ 4.5:1.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="color">
+  <div class="wrap">
+    <div class="overline">02 · Color</div>
+    <h2>Surfaces, text, accents</h2>
+    <p class="sub">Five steps of charcoal built around the Hypt brand colour #1E1E24. Click any swatch to copy it.</p>
+    <div class="grid g6" id="swatches"></div>
+    <div class="label" style="margin-top:34px">Product accents</div>
+    <div class="grid g2">
+      <div class="gradtile reveal" style="background:linear-gradient(135deg,#FF4500,#FF6F59)"><code>Accent1 #FF4500 → Accent2 #FF6F59 · on #1E1E24</code><b>Hypt · Blaze → Coral</b></div>
+      <div class="gradtile reveal" style="background:linear-gradient(135deg,#7C3AED,#B07CFF)"><code>Accent1 #7C3AED → Accent2 #B07CFF · with white</code><b>Vyu · Amethyst → Lilac</b></div>
+    </div>
+    <div class="label" style="margin-top:28px">Semantic</div>
+    <div class="grid g6" id="semantic"></div>
+  </div>
+</section>
+
+<section id="type">
+  <div class="wrap">
+    <div class="overline">03 · Type</div>
+    <h2>Segoe UI Variable, two optical sizes</h2>
+    <p class="sub"><i>Display</i> for headings, <i>Text</i> for interface copy, Cascadia Mono for timecodes. (Shown here in Inter if your system doesn't have Segoe.)</p>
+    <div class="spec"><div class="meta">Display · 46 / 800</div><div style="font:800 46px/1.05 var(--display);letter-spacing:-.03em">Clip <span class="gt">that.</span></div></div>
+    <div class="spec"><div class="meta">H1 · 26 / 600</div><div style="font:600 26px var(--display)">Your clips, on your phone.</div></div>
+    <div class="spec"><div class="meta">H2 · 20 / 600</div><div style="font:600 20px var(--display)">Create your vault</div></div>
+    <div class="spec"><div class="meta">H3 · 16 / 600</div><div style="font:600 16px var(--font)">Replay buffer length</div></div>
+    <div class="spec"><div class="meta">Body · 14 / 400</div><div style="font:400 14px var(--font);color:var(--t2)">Hypt is holding the last 2:00 of your screen.</div></div>
+    <div class="spec"><div class="meta">Caption · 12.5 / 400</div><div style="font:400 12.5px var(--font);color:var(--t3)">Neon Drift · Today · 9:14 PM</div></div>
+    <div class="spec"><div class="meta">Overline · 11 / 700</div><div style="font:700 11px var(--font);letter-spacing:.12em;text-transform:uppercase;color:var(--t3)">Quick lengths</div></div>
+    <div class="spec"><div class="meta">Mono · 13 / 600</div><div style="font:600 13px var(--mono)">0:12 / 1:04:30</div></div>
+  </div>
+</section>
+
+<section id="space">
+  <div class="wrap">
+    <div class="overline">04 · Space, shape, depth</div>
+    <h2>A 4-point grid and soft corners</h2>
+    <div class="grid g2">
+      <div class="card reveal"><h3>Spacing</h3><div id="spacing"></div></div>
+      <div class="card reveal"><h3>Radius</h3>
+        <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:12px">
+          <div class="radius" style="border-radius:6px">XS · 6</div><div class="radius" style="border-radius:10px">S · 10</div><div class="radius" style="border-radius:14px">M · 14</div>
+          <div class="radius" style="border-radius:20px">L · 20</div><div class="radius" style="border-radius:28px">XL · 28</div><div class="radius" style="border-radius:999px">Pill</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid g3" style="margin-top:16px">
+      <div class="elev reveal" style="box-shadow:0 2px 14px rgba(0,0,0,.35)">Shadow1 · 14 / 2 / 35 %</div>
+      <div class="elev reveal" style="box-shadow:0 8px 32px rgba(0,0,0,.5)">Shadow2 · 32 / 8 / 50 %</div>
+      <div class="elev reveal" style="box-shadow:0 0 28px rgba(var(--glow),.55);background:var(--grad);color:#fff">Glow · primary action only</div>
+    </div>
+  </div>
+</section>
+
+<section id="motion">
+  <div class="wrap">
+    <div class="overline">05 · Motion</div>
+    <h2>Fast start, long soft landing</h2>
+    <p class="sub">Five durations, three curves. The <b>Out</b> curve does nearly all the work; <b>Spring</b> is for things you touch.</p>
+    <div class="grid g3">
+      <div class="card reveal"><h3>Out</h3><p>Exponential ease-out · <code>cubic-bezier(.16, 1, .3, 1)</code></p><svg class="curve" viewBox="0 0 220 140" width="100%"><path d="M20 120 C 55.2 0, 86 0, 200 20" fill="none" stroke="url(#g1)" stroke-width="4" stroke-linecap="round"/><defs><linearGradient id="g1"><stop offset="0" stop-color="var(--a1)"/><stop offset="1" stop-color="var(--a2)"/></linearGradient></defs></svg></div>
+      <div class="card reveal"><h3>Spring</h3><p>Back ease-out, amplitude 0.35 · <code>cubic-bezier(.34, 1.56, .64, 1)</code></p><svg class="curve" viewBox="0 0 220 140" width="100%"><path d="M20 120 C 81.2 -36.4, 135.2 0, 200 20" fill="none" stroke="url(#g1)" stroke-width="4" stroke-linecap="round"/></svg></div>
+      <div class="card reveal"><h3>InOut</h3><p>Cubic · <code>cubic-bezier(.65, 0, .35, 1)</code> — loops &amp; HUD fades</p><svg class="curve" viewBox="0 0 220 140" width="100%"><path d="M20 120 C 137 120, 83 20, 200 20" fill="none" stroke="url(#g1)" stroke-width="4" stroke-linecap="round"/></svg></div>
+    </div>
+    <div class="grid g4" style="margin-top:16px" id="durations"></div>
+    <div class="label" style="margin-top:30px">Patterns — press the buttons</div>
+    <div class="grid g2">
+      <div class="card"><div class="row" style="justify-content:space-between"><h3>Rise · lists stagger 35 ms</h3><button class="btn" data-demo="rise">Replay</button></div>
+        <div class="stage" id="rise"><div class="blob"></div><div class="blob"></div><div class="blob"></div><div class="blob"></div><div class="blob"></div></div></div>
+      <div class="card"><div class="row" style="justify-content:space-between"><h3>Pop · toasts, QR, stars</h3><button class="btn" data-demo="pop">Replay</button></div>
+        <div class="stage" id="pop"><div class="blob" style="width:70px;height:70px;border-radius:22px"></div></div></div>
+      <div class="card"><div class="row" style="justify-content:space-between"><h3>Durations side by side</h3><button class="btn" data-demo="race">Race</button></div>
+        <div class="stage" id="race" style="flex-direction:column;align-items:stretch;padding:14px 16px;gap:4px"></div></div>
+      <div class="card"><h3>Press &amp; live pulse</h3><p style="margin-bottom:18px">Buttons squash to 95 % in 90 ms and spring back in 360 ms. The live dot pulses every 1.6 s.</p>
+        <div class="row"><button class="btn primary">Press me</button><button class="btn">Or me</button><span class="pill" style="margin:0"><i></i>Live · 2:00 buffered</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="components">
+  <div class="wrap">
+    <div class="overline">06 · Components</div>
+    <h2>The parts, working</h2>
+    <p class="sub">Every component here exists 1:1 in <code>Controls.xaml</code>.</p>
+    <div class="grid g2">
+      <div class="card reveal"><h3>Buttons</h3>
+        <div class="row" style="margin-top:14px"><button class="btn primary"><span style="font-family:var(--icons)">&#xE722;</span>Clip it</button><button class="btn">Record</button><button class="btn ghost">Record from 2:00 ago</button></div>
+        <div class="row" style="margin-top:10px"><button class="btn icon" title="Star">&#xE734;</button><button class="btn icon" title="Folder">&#xE838;</button><button class="btn danger">Delete</button></div>
+      </div>
+      <div class="card reveal"><h3>Toggle · segmented · chips</h3>
+        <div class="row" style="margin-top:14px;justify-content:space-between"><span>Voice commands</span><div class="toggle on" role="switch" aria-checked="true" tabindex="0"></div></div>
+        <div class="row" style="margin-top:12px;justify-content:space-between"><span>Hype detector</span><div class="toggle" role="switch" aria-checked="false" tabindex="0"></div></div>
+        <div class="label">Quality</div><div class="seg demo"><button>Compact</button><button class="on">Balanced</button><button>High</button><button>Ultra</button></div>
+        <div class="label">Filters</div><div class="row"><span class="chip on">All 8</span><span class="chip">Starred</span><span class="chip">Neon Drift</span><span class="chip">Pixel Siege</span></div>
+      </div>
+      <div class="card reveal"><h3>Inputs</h3>
+        <div class="label">Replay buffer length</div><input type="range" min="15" max="600" value="120" id="buf"><div style="text-align:right;font-weight:700;color:var(--a1)" id="bufv">2:00</div>
+        <div class="label">Search</div><input class="field" placeholder="Search clips, games…">
+        <div class="label">Microphone</div><div class="meter"><i></i></div>
+      </div>
+      <div class="card reveal"><h3>Clip card · hover to scrub</h3>
+        <div class="clip" id="clipdemo" style="max-width:340px;margin-top:12px"><div class="thumb"><span class="dur">0:30</span><span class="prog"></span></div><div class="meta"><b>Neon Drift 2026-10-25 20-05-44</b><small>Neon Drift · Today · 8:05 PM</small></div></div>
+      </div>
+      <div class="card reveal"><h3>Seek bar · preview on hover</h3>
+        <div class="seek" id="seekdemo" style="margin-top:110px"><div class="t"><div class="f"></div></div><div class="bubble"><div></div><span>0:39</span></div></div>
+        <div class="row" style="justify-content:space-between;font:12.5px var(--mono);color:var(--t2)"><span>0:24 / 1:04</span><span>Seahorse Valley</span></div>
+      </div>
+      <div class="card reveal"><h3>Toast · ring</h3>
+        <div class="toast" style="margin-top:12px"><div class="th"></div><div style="flex:1"><b>Clipped by voice!</b><small>Neon Drift · 0:30 · 18.4 MB</small></div><button class="btn icon">&#xE768;</button></div>
+        <div class="row" style="margin-top:18px;gap:22px"><svg width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="47" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="10"/><circle id="ring" cx="55" cy="55" r="47" fill="none" stroke="url(#g1)" stroke-width="10" stroke-linecap="round" stroke-dasharray="295.3" stroke-dashoffset="295.3" transform="rotate(-90 55 55)" style="transition:stroke-dashoffset .6s var(--out)"/></svg>
+        <div><div style="font:800 30px var(--display)" id="ringv">0:00</div><div style="font:700 11px var(--font);letter-spacing:.12em;color:var(--t3)">IN BUFFER</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="icons">
+  <div class="wrap">
+    <div class="overline">07 · Icons</div>
+    <h2>Segoe Fluent Icons</h2>
+    <p class="sub">The Windows 11 icon font — consistent with the OS, zero bytes to ship. On other systems the glyphs below may not render.</p>
+    <div class="grid g6" id="iconsgrid"></div>
+  </div>
+</section>
+
+<section id="brand">
+  <div class="wrap">
+    <div class="overline">08 · Brand</div>
+    <h2>Two marks, one family</h2>
+    <p class="sub">Hypt's mark comes from the brand artwork (<code>design/brand-from-art.ps1</code> keys it out of its background and builds every icon size). Vyu's mark is drawn in code (<code>design/make-icons.ps1</code>): a purple squircle with a white glyph.</p>
+    <div class="grid g2">
+      <div class="logo reveal"><img src="assets/hypt-mark.png" alt="Hypt mark"><div><h3 style="margin:0;font:700 26px var(--display)">Hypt</h3><p style="color:var(--t2);margin:6px 0 0">An <b>H</b> inside a recording frame — a player leaps off the crossbar and the right stem turns into a camera. Blaze → Coral on charcoal.</p></div></div>
+      <div class="logo reveal"><img src="assets/vyu-mark.png" alt="Vyu mark"><div><h3 style="margin:0;font:700 26px var(--display)">Vyu</h3><p style="color:var(--t2);margin:6px 0 0">An <b>eye</b> whose pupil is a play button — watching, simply. Amethyst → Lilac with white.</p></div></div>
+    </div>
+    <div class="grid g3" style="margin-top:16px">
+      <div class="card"><h3>✓ Do</h3><p>Keep a quarter of the mark as clear space. Use on dark surfaces. Minimum 16 px.</p></div>
+      <div class="card"><h3>✕ Don't</h3><p>Recolor the glyph, swap the two gradients, stretch the squircle or add outlines.</p></div>
+      <div class="card"><h3>Names</h3><p><b>Hypt</b> reads “hyped”. <b>Vyu</b> reads “view”. Always one word, capital first letter.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="tokens">
+  <div class="wrap">
+    <div class="overline">09 · Tokens</div>
+    <h2>Take them with you</h2>
+    <p class="sub">Same values everywhere. Copy the format you need.</p>
+    <div class="seg tabs" id="tokentabs"><button class="on" data-t="css">CSS</button><button data-t="json">JSON</button><button data-t="xaml">XAML</button></div>
+    <div style="position:relative"><button class="btn" id="copytok" style="position:absolute;right:12px;top:12px">Copy</button><pre id="tokcode"></pre></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap row" style="justify-content:space-between">
+    <span>Kinetic design system · made for Hypt &amp; <a href="./">Vyu</a> · open source</span>
+    <span>Typefaces &amp; icons: Segoe UI Variable, Segoe Fluent Icons (Microsoft)</span>
+  </div>
+</footer>
+<div class="copied" id="copied">Copied</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const root=document.documentElement;
+function setProduct(p){root.dataset.product=p;$$('nav .seg button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));renderTokens();}
+$$('nav .seg button').forEach(b=>b.onclick=()=>setProduct(b.dataset.p));
+const qp=new URLSearchParams(location.search).get('product');setProduct(qp||root.dataset.product);
+function toast(t){const el=$('#copied');el.textContent=t;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),1400)}
+function copy(t){navigator.clipboard?.writeText(t).then(()=>toast('Copied '+t.split('\n')[0].slice(0,40)))}
+const surfaces=[['Bg0','#141418','void'],['Bg1','#1E1E24','window · brand charcoal'],['Bg2','#25252C','card'],['Bg3','#2E2E36','elevated'],['Bg4','#393942','hover'],['Line2','rgba(255,255,255,.15)','border'],
+ ['Text1','#F5F5F7','primary'],['Text2','#B4B4C0','secondary'],['Text3','#8A8A96','tertiary'],['Text4','#5C5C68','disabled']];
+const semantic=[['Success','#2EE59D','saved, live'],['Warning','#FFC23D','privacy, markers'],['Danger','#FF4D5E','delete, errors'],['Info','#4DA3FF','hints'],['Live','#FF2E4D','recording']];
+function sw(list,el){$(el).innerHTML=list.map(([n,c,u])=>`<div class="sw reveal" data-c="${c}"><div class="c" style="background:${c}"></div><div class="m"><b>${n}</b><code>${c}</code><br><code>${u}</code></div></div>`).join('');}
+sw(surfaces,'#swatches');sw(semantic,'#semantic');
+$$('.sw').forEach(s=>s.onclick=()=>copy(s.dataset.c));
+$('#spacing').innerHTML=[2,4,8,12,16,20,24,32,40,48,64].map(v=>`<div class="row" style="margin:8px 0"><code style="width:32px;color:var(--t3)">${v}</code><div class="bar" style="width:${v*4}px"></div></div>`).join('');
+const durs=[['Instant','90 ms','press down'],['Fast','160 ms','hover, fade'],['Base','240 ms','state change'],['Slow','360 ms','toggle, release'],['Deliberate','520 ms','entrance, sheets']];
+$('#durations').innerHTML=durs.map(([n,d,u])=>`<div class="card reveal"><span class="num">${d}</span><h3>${n}</h3><p>${u}</p></div>`).join('');
+$('#race').innerHTML=durs.map(([n,d])=>`<div style="position:relative;height:18px"><div class="track"></div><div class="runner" data-d="${parseInt(d)}"></div><code style="position:absolute;right:0;top:-1px;font-size:11px;color:var(--t3)">${n}</code></div>`).join('');
+function demo(k){
+  if(k==='rise'){$$('#rise .blob').forEach((b,i)=>b.animate([{opacity:0,transform:'translateY(14px)'},{opacity:1,transform:'none'}],{duration:520,delay:i*35,easing:'cubic-bezier(.16,1,.3,1)',fill:'both'}))}
+  if(k==='pop'){$('#pop .blob').animate([{transform:'scale(.6)',opacity:.3},{transform:'scale(1)',opacity:1}],{duration:420,easing:'cubic-bezier(.34,1.56,.64,1)'})}
+  if(k==='race'){$$('#race .runner').forEach(r=>{const w=r.parentElement.clientWidth-120;r.animate([{transform:'translateX(0)'},{transform:`translateX(${w}px)`}],{duration:+r.dataset.d*2.5,easing:'cubic-bezier(.16,1,.3,1)',fill:'both'})})}
+}
+$$('[data-demo]').forEach(b=>b.onclick=()=>demo(b.dataset.demo));
+$$('.toggle').forEach(t=>{const f=()=>{t.classList.toggle('on');t.setAttribute('aria-checked',t.classList.contains('on'))};t.onclick=f;t.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();f()}}});
+$$('.seg.demo button').forEach(b=>b.onclick=()=>{b.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on')});
+$$('.chip').forEach(c=>c.onclick=()=>{$$('.chip').forEach(x=>x.classList.remove('on'));c.classList.add('on')});
+const fmt=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+const buf=$('#buf');const upd=()=>{buf.style.setProperty('--p',((buf.value-buf.min)/(buf.max-buf.min)*100)+'%');$('#bufv').textContent=fmt(+buf.value)};buf.oninput=upd;upd();
+const cd=$('#clipdemo .thumb');cd.onmousemove=e=>{const r=cd.getBoundingClientRect();const f=Math.min(.999,Math.max(0,(e.clientX-r.left)/r.width));const i=Math.floor(f*10);cd.style.setProperty('--scrub',(i/9*100)+'%');cd.style.setProperty('--scrubw',(f*100)+'%')};cd.onmouseleave=()=>cd.style.setProperty('--scrubw','0');
+const sk=$('#seekdemo');sk.onmousemove=e=>{const r=sk.getBoundingClientRect();const f=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width));const b=sk.querySelector('.bubble');b.style.left=(f*100)+'%';b.querySelector('span').textContent=fmt(Math.round(f*64));b.querySelector('div').style.setProperty('--bp',(f*100)+'%')};
+let rv=0;setInterval(()=>{rv=rv>=120?0:rv+6;$('#ring').style.strokeDashoffset=295.3*(1-rv/120);$('#ringv').textContent=fmt(rv)},500);
+const icons=[['E768','play'],['E769','pause'],['E7C8','record'],['E722','clip'],['E8B2','clips'],['E8EA','phone'],['E72E','vault'],['E713','settings'],['E735','star'],['E720','mic'],['E74F','mute'],['EFA9','voice'],['ED14','QR'],['E945','lightning'],['EA18','shield'],['E7F0','subtitles'],['E90B','playlist'],['E9E9','tune'],['E740','fullscreen'],['E92C','PiP'],['E81C','history'],['E916','stopwatch'],['E78A','trim'],['E8C8','copy']];
+$('#iconsgrid').innerHTML=icons.map(([c,n])=>`<div class="ico reveal" data-c="&amp;#x${c};"><span>&#x${c};</span><small>${c} · ${n}</small></div>`).join('');
+$$('.ico').forEach(i=>i.onclick=()=>copy(i.querySelector('small').textContent.split(' ')[0]));
+function renderTokens(){
+  const p=root.dataset.product==='vyu'?{a1:'#7C3AED',a2:'#B07CFF',name:'Vyu'}:{a1:'#FF4500',a2:'#FF6F59',name:'Hypt'};
+  const t=$('#tokentabs .on')?.dataset.t||'css';
+  const base={bg0:'#141418',bg1:'#1E1E24',bg2:'#25252C',bg3:'#2E2E36',bg4:'#393942',text1:'#F5F5F7',text2:'#B4B4C0',text3:'#8A8A96',text4:'#5C5C68',success:'#2EE59D',warning:'#FFC23D',danger:'#FF4D5E',info:'#4DA3FF',live:'#FF2E4D',accent1:p.a1,accent2:p.a2};
+  let out='';
+  if(t==='css'){out=`/* Kinetic · ${p.name} */\n:root {\n`+Object.entries(base).map(([k,v])=>`  --k-${k}: ${v};`).join('\n')+`\n  --k-line: rgba(255,255,255,.08);\n  --k-line2: rgba(255,255,255,.15);\n  --k-gradient: linear-gradient(135deg, var(--k-accent1), var(--k-accent2));\n  --k-radius-s: 10px; --k-radius-m: 14px; --k-radius-l: 20px; --k-radius-xl: 28px;\n  --k-ease-out: cubic-bezier(.16,1,.3,1);\n  --k-ease-spring: cubic-bezier(.34,1.56,.64,1);\n  --k-instant: 90ms; --k-fast: 160ms; --k-base: 240ms; --k-slow: 360ms; --k-deliberate: 520ms;\n}`}
+  if(t==='json'){out=JSON.stringify({name:`Kinetic · ${p.name}`,color:base,radius:{xs:6,s:10,m:14,l:20,xl:28,pill:999},space:[2,4,8,12,16,20,24,32,40,48,64],type:{display:[38,700],h1:[26,600],h2:[20,600],h3:[16,600],body:[14,400],caption:[12.5,400],overline:[11,700]},motion:{instant:90,fast:160,base:240,slow:360,deliberate:520,out:[.16,1,.3,1],spring:[.34,1.56,.64,1],stagger:35}},null,2)}
+  if(t==='xaml'){out=`<!-- Kinetic · ${p.name} (excerpt of Tokens.xaml) -->\n`+Object.entries(base).map(([k,v])=>`<Color x:Key="K.${k[0].toUpperCase()+k.slice(1)}">${v}</Color>`).join('\n')+`\n<LinearGradientBrush x:Key="K.AccentGradient" StartPoint="0,0" EndPoint="1,1">\n  <GradientStop Color="{StaticResource K.Accent1}" Offset="0" />\n  <GradientStop Color="{StaticResource K.Accent2}" Offset="1" />\n</LinearGradientBrush>\n<ExponentialEase x:Key="K.EaseOut" EasingMode="EaseOut" Exponent="6" />\n<BackEase x:Key="K.EaseSpring" EasingMode="EaseOut" Amplitude="0.35" />\n<Duration x:Key="K.Base">0:0:0.24</Duration>`}
+  $('#tokcode').textContent=out;
+}
+$$('#tokentabs button').forEach(b=>b.onclick=()=>{$$('#tokentabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderTokens()});
+$('#copytok').onclick=()=>copy($('#tokcode').textContent);
+renderTokens();
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+$$('.reveal').forEach((el,i)=>{el.style.transitionDelay=(i%6)*35+'ms';io.observe(el)});
+</script>
+</body>
+</html>

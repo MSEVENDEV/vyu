@@ -1,0 +1,424 @@
+<Window x:Class="Vyu.Views.ControlsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:k="clr-namespace:Vyu.Kinetic"
+        Title="Vyu controls" WindowStyle="None" AllowsTransparency="True" Background="Transparent" ShowInTaskbar="False"
+        ResizeMode="NoResize" FontFamily="{StaticResource K.Font}" Foreground="{StaticResource K.Text1Brush}" UseLayoutRounding="True">
+    <Window.Resources>
+        <Style x:Key="Ctl" TargetType="Button" BasedOn="{StaticResource K.Button.IconGhost}">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="42" />
+            <Setter Property="FontSize" Value="17" />
+        </Style>
+        <Style x:Key="PanelHead" TargetType="TextBlock" BasedOn="{StaticResource K.Overline}">
+            <Setter Property="Margin" Value="0,18,0,8" />
+        </Style>
+        <Style x:Key="ListItem" TargetType="Button" BasedOn="{StaticResource K.Button.Ghost}">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Height" Value="Auto" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="Foreground" Value="{StaticResource K.Text1Brush}" />
+            <Setter Property="FontWeight" Value="Normal" />
+        </Style>
+    </Window.Resources>
+
+    <Grid x:Name="Surface" Background="#01000000" MouseMove="OnSurfaceMove" MouseLeftButtonDown="OnSurfaceDown" MouseLeftButtonUp="OnSurfaceUp"
+          MouseWheel="OnWheel" MouseRightButtonUp="OnRightClick" MouseLeave="OnSurfaceLeave">
+
+        <!-- screenshot mode only: a real decoded frame stands in for the native video surface -->
+        <Image x:Name="SnapFrame" Stretch="Uniform" Visibility="Collapsed" IsHitTestVisible="False" />
+
+        <!-- ================= home (nothing playing) ================= -->
+        <Grid x:Name="Home" Background="#141418">
+            <Rectangle Fill="{StaticResource K.Aurora}" IsHitTestVisible="False" />
+            <Ellipse Width="900" Height="900" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-380,-420" IsHitTestVisible="False" Opacity="0.5">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Color="#448B5CF6" Offset="0" />
+                        <GradientStop Color="#008B5CF6" Offset="1" />
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,70,0,0">
+                <StackPanel x:Name="HomeContent" Margin="40,30,40,40" HorizontalAlignment="Center" MaxWidth="1040">
+                    <Image Source="/Assets/vyu-mark.png" Width="84" Height="84" RenderOptions.BitmapScalingMode="HighQuality" HorizontalAlignment="Center" k:Motion.Enter="True">
+                        <Image.Effect>
+                            <DropShadowEffect BlurRadius="40" ShadowDepth="0" Opacity="0.6" Color="#8B5CF6" />
+                        </Image.Effect>
+                    </Image>
+                    <TextBlock Style="{StaticResource K.Display}" FontSize="40" HorizontalAlignment="Center" Margin="0,20,0,0" k:Motion.Enter="True" k:Motion.Delay="60">
+                        <Run Text="Press play on" /> <Run Text="anything." Foreground="{StaticResource K.AccentGradientH}" />
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource K.Body2}" FontSize="15" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,10,0,0" k:Motion.Enter="True" k:Motion.Delay="100"
+                               Text="Drop a video anywhere in this window. MKV, MP4, HEVC, AV1, HDR, subtitles, streams — it all just plays." />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,26,0,0" k:Motion.Enter="True" k:Motion.Delay="140">
+                        <Button Style="{StaticResource K.Button.Primary}" Click="OnOpenFile" Height="48" Padding="22,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE8E5;" FontFamily="{StaticResource K.Icons}" FontSize="16" VerticalAlignment="Center" />
+                                <TextBlock Text="Open file" Margin="10,0,0,0" FontSize="15" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource K.Button}" Click="OnOpenFolder" Height="48" Margin="10,0,0,0" Background="#1AFFFFFF">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE838;" FontFamily="{StaticResource K.Icons}" FontSize="15" VerticalAlignment="Center" />
+                                <TextBlock Text="Open folder" Margin="10,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource K.Button}" Click="OnOpenUrl" Height="48" Margin="10,0,0,0" Background="#1AFFFFFF">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE71B;" FontFamily="{StaticResource K.Icons}" FontSize="15" VerticalAlignment="Center" />
+                                <TextBlock Text="Open link" Margin="10,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="HyptBtn" Style="{StaticResource K.Button}" Click="OnHyptClips" Height="48" Margin="10,0,0,0" Background="#1AFFFFFF" Visibility="Collapsed"
+                                ToolTip="Your Hypt clips folder">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE945;" FontFamily="{StaticResource K.Icons}" FontSize="15" VerticalAlignment="Center" Foreground="#FF4500" />
+                                <TextBlock Text="Hypt clips" Margin="10,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <TextBlock x:Name="RecentHead" Text="CONTINUE WATCHING" Style="{StaticResource K.Overline}" Margin="6,46,0,12" />
+                    <ItemsControl x:Name="RecentList">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource K.Button}" Height="Auto" Padding="0" Margin="6" HorizontalContentAlignment="Stretch" Background="{StaticResource K.Bg2Brush}"
+                                        Click="OnRecent" Tag="{Binding}" k:Motion.Enter="True" k:Motion.Stagger="True" k:Motion.Delay="160">
+                                    <Grid Margin="16,14,10,14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="40" Height="40" CornerRadius="12" Background="{StaticResource K.AccentSoftBrush}" VerticalAlignment="Center">
+                                            <TextBlock Text="&#xE768;" Style="{StaticResource K.Icon}" FontSize="15" Foreground="{StaticResource K.Accent1Brush}" Margin="2,0,0,0" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Margin="12,0,6,0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="13.5" TextTrimming="CharacterEllipsis" Foreground="{StaticResource K.Text1Brush}" />
+                                            <TextBlock Text="{Binding Subtitle}" Style="{StaticResource K.Caption}" Margin="0,2,0,6" TextTrimming="CharacterEllipsis" />
+                                            <ProgressBar Style="{StaticResource K.Progress}" Height="3" Maximum="1" Value="{Binding Progress, Mode=OneWay}" />
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Style="{StaticResource K.Button.IconGhost}" Width="28" Height="28" FontSize="10" Content="&#xE711;"
+                                                Click="OnForget" Tag="{Binding}" ToolTip="Remove from list" VerticalAlignment="Top" />
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Style="{StaticResource K.Caption}" HorizontalAlignment="Center" Margin="0,30,0,0" Foreground="{StaticResource K.Text4Brush}"
+                               Text="Space play · ← → seek · ↑ ↓ volume · F fullscreen · P picture-in-picture · Ctrl+O open · ? all shortcuts" />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- ================= buffering spinner ================= -->
+        <Grid x:Name="Spinner" Width="64" Height="64" Visibility="Collapsed" IsHitTestVisible="False">
+            <k:RingProgress Value="0.28" Thickness="5" Stroke="{StaticResource K.AccentGradient}" Track="#22FFFFFF" RenderTransformOrigin="0.5,0.5">
+                <k:RingProgress.RenderTransform>
+                    <RotateTransform x:Name="SpinRot" />
+                </k:RingProgress.RenderTransform>
+            </k:RingProgress>
+        </Grid>
+
+        <!-- ================= centre feedback ================= -->
+        <Border x:Name="Hud" Width="96" Height="96" CornerRadius="48" Background="#99000000" Opacity="0" IsHitTestVisible="False">
+            <TextBlock x:Name="HudGlyph" Style="{StaticResource K.Icon}" FontSize="36" Foreground="White" />
+        </Border>
+        <Border x:Name="SeekHudLeft" Width="140" Height="140" CornerRadius="70" Background="#66000000" HorizontalAlignment="Left" Margin="120,0,0,0" Opacity="0" IsHitTestVisible="False">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="&#xEB9E;" Style="{StaticResource K.Icon}" FontSize="30" Foreground="White" />
+                <TextBlock x:Name="SeekHudLeftText" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,6,0,0" />
+            </StackPanel>
+        </Border>
+        <Border x:Name="SeekHudRight" Width="140" Height="140" CornerRadius="70" Background="#66000000" HorizontalAlignment="Right" Margin="0,0,120,0" Opacity="0" IsHitTestVisible="False">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="&#xEB9D;" Style="{StaticResource K.Icon}" FontSize="30" Foreground="White" />
+                <TextBlock x:Name="SeekHudRightText" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,6,0,0" />
+            </StackPanel>
+        </Border>
+        <Border x:Name="Osd" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,86,0,0" CornerRadius="14" Background="#D91E1E24"
+                BorderBrush="{StaticResource K.Line2Brush}" BorderThickness="1" Padding="16,10" Opacity="0" IsHitTestVisible="False">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="OsdGlyph" Style="{StaticResource K.Icon}" FontSize="15" Foreground="{StaticResource K.Accent1Brush}" />
+                <TextBlock x:Name="OsdText" FontSize="14" FontWeight="SemiBold" Margin="10,0,0,0" VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
+        <!-- volume pill -->
+        <Border x:Name="VolHud" Width="54" Height="200" CornerRadius="27" Background="#CC1E1E24" BorderBrush="{StaticResource K.Line2Brush}" BorderThickness="1"
+                HorizontalAlignment="Right" Margin="0,0,36,0" Opacity="0" IsHitTestVisible="False">
+            <Grid Margin="0,16,0,14">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Border Width="6" CornerRadius="3" Background="#33FFFFFF" />
+                <Border x:Name="VolHudFill" Width="6" CornerRadius="3" Background="{StaticResource K.AccentGradient}" VerticalAlignment="Bottom" />
+                <TextBlock x:Name="VolHudText" Grid.Row="1" FontSize="11.5" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0" />
+            </Grid>
+        </Border>
+
+        <!-- ================= top bar ================= -->
+        <Grid x:Name="TopBar" VerticalAlignment="Top" Height="104">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#C0000000" Offset="0" />
+                    <GradientStop Color="#00000000" Offset="1" />
+                </LinearGradientBrush>
+            </Grid.Background>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="22,16,0,0">
+                <Image Source="/Assets/vyu-mark.png" Width="26" Height="26" RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Top" Margin="0,2,0,0" />
+                <StackPanel Margin="12,0,0,0">
+                    <TextBlock x:Name="TitleText" Text="Vyu" FontSize="16" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="760" />
+                    <TextBlock x:Name="MetaText" FontSize="12" Foreground="#B3FFFFFF" Margin="0,2,0,0" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,10,0">
+                <Button x:Name="PinBtn" Style="{StaticResource K.Caption.Button}" Content="&#xE718;" Click="OnPin" ToolTip="Always on top (T)" />
+                <Button Style="{StaticResource K.Caption.Button}" Content="&#xE92C;" Click="OnPip" ToolTip="Picture-in-picture (P)" FontSize="12" />
+                <Button Style="{StaticResource K.Caption.Button}" Content="&#xE921;" Click="OnMinimize" ToolTip="Minimize" />
+                <Button x:Name="MaxBtn" Style="{StaticResource K.Caption.Button}" Content="&#xE922;" Click="OnMaximize" ToolTip="Maximize" />
+                <Button Style="{StaticResource K.Caption.Close}" Content="&#xE8BB;" Click="OnClose" ToolTip="Close" />
+            </StackPanel>
+        </Grid>
+
+        <!-- ================= bottom controls ================= -->
+        <Grid x:Name="Bottom" VerticalAlignment="Bottom">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#00000000" Offset="0" />
+                    <GradientStop Color="#D9000000" Offset="1" />
+                </LinearGradientBrush>
+            </Grid.Background>
+            <StackPanel Margin="0,60,0,0">
+                <!-- seek bar -->
+                <Grid x:Name="SeekArea" Height="30" Margin="24,0,24,0" Background="Transparent" Cursor="Hand"
+                      MouseEnter="OnSeekEnter" MouseLeave="OnSeekLeave" MouseMove="OnSeekMove" MouseLeftButtonDown="OnSeekDown" MouseLeftButtonUp="OnSeekUp">
+                    <Grid x:Name="SeekTrackHost" Height="4" VerticalAlignment="Center">
+                        <Border CornerRadius="3" Background="#3DFFFFFF" />
+                        <Border x:Name="CacheFill" CornerRadius="3" Background="#40FFFFFF" HorizontalAlignment="Left" Width="0" />
+                        <Border x:Name="SeekFill" CornerRadius="3" Background="{StaticResource K.AccentGradientH}" HorizontalAlignment="Left" Width="0" />
+                        <Border x:Name="HoverFill" CornerRadius="3" Background="#33FFFFFF" HorizontalAlignment="Left" Width="0" Opacity="0" />
+                    </Grid>
+                    <Canvas x:Name="ChapterTicks" IsHitTestVisible="False" VerticalAlignment="Center" Height="8" />
+                    <Canvas x:Name="ABMarks" IsHitTestVisible="False" VerticalAlignment="Center" Height="16" />
+                    <Canvas IsHitTestVisible="False">
+                        <Ellipse x:Name="SeekKnob" Width="14" Height="14" Fill="White" Canvas.Top="8" Opacity="0" RenderTransformOrigin="0.5,0.5">
+                            <Ellipse.RenderTransform>
+                                <ScaleTransform x:Name="KnobScale" ScaleX="0.4" ScaleY="0.4" />
+                            </Ellipse.RenderTransform>
+                            <Ellipse.Effect>
+                                <DropShadowEffect BlurRadius="12" ShadowDepth="0" Opacity="0.9" Color="#A78BFA" />
+                            </Ellipse.Effect>
+                        </Ellipse>
+                    </Canvas>
+                </Grid>
+
+                <Grid Margin="16,2,16,14">
+                    <StackPanel Orientation="Horizontal">
+                        <Button Style="{StaticResource Ctl}" Content="&#xE892;" Click="OnPrev" ToolTip="Previous (Shift+P)" x:Name="PrevBtn" />
+                        <Button x:Name="PlayBtn" Style="{StaticResource K.Button.Primary}" Background="White" Width="48" Height="48" Padding="0" Margin="4,0" Click="OnPlayPause" ToolTip="Play / pause (Space)">
+                            <TextBlock x:Name="PlayGlyph" Text="&#xE768;" FontFamily="{StaticResource K.Icons}" FontSize="18" Margin="2,0,0,0" Foreground="{StaticResource K.Accent1Brush}" FontWeight="Bold" />
+                        </Button>
+                        <Button Style="{StaticResource Ctl}" Content="&#xE893;" Click="OnNext" ToolTip="Next (Shift+N)" x:Name="NextBtn" />
+                        <Button x:Name="VolBtn" Style="{StaticResource Ctl}" Content="&#xE767;" Click="OnMuteClick" ToolTip="Mute (M) — scroll to change volume" Margin="8,0,0,0" />
+                        <Slider x:Name="VolSlider" Style="{StaticResource K.Slider}" Width="104" Minimum="0" Maximum="150" VerticalAlignment="Center" ValueChanged="OnVolumeSlider" />
+                        <TextBlock x:Name="TimeLabel" FontFamily="{StaticResource K.FontMono}" FontSize="13" Foreground="#E6FFFFFF" VerticalAlignment="Center" Margin="16,0,0,0"
+                                   Cursor="Hand" MouseLeftButtonUp="OnTimeClick" ToolTip="Click: show remaining time" />
+                        <TextBlock x:Name="ChapterText" FontSize="12.5" Foreground="#99FFFFFF" VerticalAlignment="Center" Margin="14,0,0,0" TextTrimming="CharacterEllipsis" MaxWidth="260" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button x:Name="SpeedBtn" Style="{StaticResource K.Button.Ghost}" Foreground="White" Height="42" Padding="10,0" FontSize="13" Content="1×" Click="OnSpeedClick" ToolTip="Speed ( [ ] )" />
+                        <Button x:Name="SubsBtn" Style="{StaticResource Ctl}" Content="&#xE7F0;" Click="OnTracks" ToolTip="Subtitles &amp; audio (V / A)" />
+                        <Button Style="{StaticResource Ctl}" Content="&#xE90B;" Click="OnPlaylist" ToolTip="Playlist (L)" />
+                        <Button Style="{StaticResource Ctl}" Content="&#xE9E9;" Click="OnSettings" ToolTip="Picture, sound &amp; settings" />
+                        <Button x:Name="FullBtn" Style="{StaticResource Ctl}" Content="&#xE740;" Click="OnFullscreen" ToolTip="Full screen (F / double-click)" />
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Grid>
+
+        <!-- seek preview -->
+        <Canvas x:Name="PreviewLayer" IsHitTestVisible="False">
+            <Border x:Name="Preview" CornerRadius="14" Background="#F01E1E24" BorderBrush="{StaticResource K.Line2Brush}" BorderThickness="1" Padding="5" Opacity="0">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="24" ShadowDepth="6" Opacity="0.55" />
+                </Border.Effect>
+                <StackPanel>
+                    <Border x:Name="PreviewImageHost" CornerRadius="10" ClipToBounds="True" Width="232" Height="130" Background="Black">
+                        <Image x:Name="PreviewImage" Stretch="UniformToFill" />
+                    </Border>
+                    <TextBlock x:Name="PreviewChapter" FontSize="11.5" Foreground="#B3FFFFFF" HorizontalAlignment="Center" Margin="0,5,0,0" TextTrimming="CharacterEllipsis" MaxWidth="220" />
+                    <TextBlock x:Name="PreviewTime" FontFamily="{StaticResource K.FontMono}" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,2" />
+                </StackPanel>
+            </Border>
+        </Canvas>
+
+        <!-- ================= side panel ================= -->
+        <Border x:Name="Panel" Width="372" HorizontalAlignment="Right" Margin="0,64,14,118" CornerRadius="22" Background="#F21E1E24"
+                BorderBrush="{StaticResource K.Line2Brush}" BorderThickness="1" Visibility="Collapsed" MouseLeftButtonDown="OnPanelDown" MouseWheel="OnPanelWheel">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="40" ShadowDepth="10" Opacity="0.55" />
+            </Border.Effect>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid Margin="20,16,10,0">
+                    <Border Style="{StaticResource K.SegmentHost}">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="TabTracks" Style="{StaticResource K.Segment}" Content="Tracks" GroupName="tabs" Checked="OnTab" Padding="12,0" />
+                            <RadioButton x:Name="TabList" Style="{StaticResource K.Segment}" Content="Playlist" GroupName="tabs" Checked="OnTab" Padding="12,0" />
+                            <RadioButton x:Name="TabPicture" Style="{StaticResource K.Segment}" Content="Tune" GroupName="tabs" Checked="OnTab" Padding="12,0" />
+                            <RadioButton x:Name="TabInfo" Style="{StaticResource K.Segment}" Content="Info" GroupName="tabs" Checked="OnTab" Padding="12,0" />
+                        </StackPanel>
+                    </Border>
+                    <Button Style="{StaticResource K.Button.IconGhost}" Content="&#xE8BB;" FontSize="11" HorizontalAlignment="Right" Click="OnClosePanel" />
+                </Grid>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,6,0,14">
+                    <Grid Margin="20,0,16,0">
+                        <!-- tracks -->
+                        <StackPanel x:Name="TracksView">
+                            <TextBlock Text="SUBTITLES" Style="{StaticResource PanelHead}" />
+                            <StackPanel x:Name="SubList" />
+                            <Button Style="{StaticResource K.Button}" Content="Load subtitle file…" HorizontalAlignment="Left" Margin="0,8,0,0" Height="34" FontSize="12.5" Click="OnLoadSub" />
+                            <Grid Margin="0,14,0,4">
+                                <TextBlock Text="Subtitle delay" Style="{StaticResource K.Caption}" />
+                                <TextBlock x:Name="SubDelayText" Style="{StaticResource K.Caption}" HorizontalAlignment="Right" Foreground="{StaticResource K.Text1Brush}" />
+                            </Grid>
+                            <Slider x:Name="SubDelay" Style="{StaticResource K.Slider}" Minimum="-5" Maximum="5" SmallChange="0.1" ValueChanged="OnSubDelay" />
+                            <Grid Margin="0,8,0,4">
+                                <TextBlock Text="Subtitle size" Style="{StaticResource K.Caption}" />
+                                <TextBlock x:Name="SubSizeText" Style="{StaticResource K.Caption}" HorizontalAlignment="Right" Foreground="{StaticResource K.Text1Brush}" />
+                            </Grid>
+                            <Slider x:Name="SubSize" Style="{StaticResource K.Slider}" Minimum="0.5" Maximum="2.5" ValueChanged="OnSubSize" />
+                            <TextBlock Text="AUDIO" Style="{StaticResource PanelHead}" />
+                            <StackPanel x:Name="AudioList" />
+                            <Grid Margin="0,14,0,4">
+                                <TextBlock Text="Audio delay" Style="{StaticResource K.Caption}" />
+                                <TextBlock x:Name="AudioDelayText" Style="{StaticResource K.Caption}" HorizontalAlignment="Right" Foreground="{StaticResource K.Text1Brush}" />
+                            </Grid>
+                            <Slider x:Name="AudioDelay" Style="{StaticResource K.Slider}" Minimum="-2" Maximum="2" SmallChange="0.05" ValueChanged="OnAudioDelay" />
+                        </StackPanel>
+
+                        <!-- playlist -->
+                        <StackPanel x:Name="ListView" Visibility="Collapsed">
+                            <TextBlock x:Name="ListHead" Text="UP NEXT" Style="{StaticResource PanelHead}" />
+                            <StackPanel x:Name="PlaylistItems" />
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <Button Style="{StaticResource K.Button}" Height="34" FontSize="12.5" Content="Add files…" Click="OnAddFiles" />
+                                <CheckBox x:Name="ShuffleBox" Style="{StaticResource K.Toggle}" Margin="16,0,0,0" Click="OnShuffle">
+                                    <TextBlock Text="Shuffle" Style="{StaticResource K.Caption}" Foreground="{StaticResource K.Text2Brush}" />
+                                </CheckBox>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- picture & sound -->
+                        <StackPanel x:Name="TuneView" Visibility="Collapsed">
+                            <TextBlock Text="SPEED" Style="{StaticResource PanelHead}" />
+                            <WrapPanel x:Name="SpeedChips" />
+                            <TextBlock Text="PICTURE" Style="{StaticResource PanelHead}" />
+                            <Grid Margin="0,0,0,2"><TextBlock Text="Brightness" Style="{StaticResource K.Caption}" /><TextBlock x:Name="BriText" Style="{StaticResource K.Caption}" HorizontalAlignment="Right" /></Grid>
+                            <Slider x:Name="Bri" Style="{StaticResource K.Slider}" Minimum="-50" Maximum="50" Tag="brightness" ValueChanged="OnEq" />
+                            <Grid Margin="0,6,0,2"><TextBlock Text="Contrast" Style="{StaticResource K.Caption}" /><TextBlock x:Name="ConText" Style="{StaticResource K.Caption}" HorizontalAlignment="Right" /></Grid>
+                            <Slider x:Name="Con" Style="{StaticResource K.Slider}" Minimum="-50" Maximum="50" Tag="contrast" ValueChanged="OnEq" />
+                            <Grid Margin="0,6,0,2"><TextBlock Text="Saturation" Style="{StaticResource K.Caption}" /><TextBlock x:Name="SatText" Style="{StaticResource K.Caption}" HorizontalAlignment="Right" /></Grid>
+                            <Slider x:Name="Sat" Style="{StaticResource K.Slider}" Minimum="-50" Maximum="50" Tag="saturation" ValueChanged="OnEq" />
+                            <Grid Margin="0,6,0,2"><TextBlock Text="Gamma" Style="{StaticResource K.Caption}" /><TextBlock x:Name="GamText" Style="{StaticResource K.Caption}" HorizontalAlignment="Right" /></Grid>
+                            <Slider x:Name="Gam" Style="{StaticResource K.Slider}" Minimum="-50" Maximum="50" Tag="gamma" ValueChanged="OnEq" />
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <Button Style="{StaticResource K.Button}" Height="32" FontSize="12" Padding="10,0" Content="Aspect" Click="OnAspect" />
+                                <Button Style="{StaticResource K.Button}" Height="32" FontSize="12" Padding="10,0" Content="Rotate" Margin="6,0,0,0" Click="OnRotate" />
+                                <Button Style="{StaticResource K.Button}" Height="32" FontSize="12" Padding="10,0" Content="Zoom to fill" Margin="6,0,0,0" Click="OnZoomFill" />
+                                <Button Style="{StaticResource K.Button.Ghost}" Height="32" FontSize="12" Padding="10,0" Content="Reset" Margin="6,0,0,0" Click="OnResetPicture" />
+                            </StackPanel>
+                            <TextBlock Text="SOUND" Style="{StaticResource PanelHead}" />
+                            <CheckBox x:Name="NightBox" Style="{StaticResource K.Toggle}" Click="OnNight">
+                                <StackPanel>
+                                    <TextBlock Text="Night mode" FontWeight="SemiBold" />
+                                    <TextBlock Text="Quieter explosions, clearer voices." Style="{StaticResource K.Caption}" />
+                                </StackPanel>
+                            </CheckBox>
+                            <TextBlock Text="VYU" Style="{StaticResource PanelHead}" />
+                            <TextBlock Text="Picture quality" Style="{StaticResource K.Caption}" Margin="0,0,0,6" />
+                            <Border Style="{StaticResource K.SegmentHost}">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="QFast" Style="{StaticResource K.Segment}" Content="Battery" GroupName="q" Click="OnQuality" Padding="12,0" />
+                                    <RadioButton x:Name="QBal" Style="{StaticResource K.Segment}" Content="Balanced" GroupName="q" Click="OnQuality" Padding="12,0" />
+                                    <RadioButton x:Name="QCin" Style="{StaticResource K.Segment}" Content="Cinema" GroupName="q" Click="OnQuality" Padding="12,0" />
+                                </StackPanel>
+                            </Border>
+                            <CheckBox x:Name="HwBox" Style="{StaticResource K.Toggle}" Margin="0,14,0,0" Click="OnHw">
+                                <TextBlock Text="Hardware decoding" />
+                            </CheckBox>
+                            <CheckBox x:Name="ResumeBox" Style="{StaticResource K.Toggle}" Margin="0,12,0,0" Click="OnPrefs">
+                                <TextBlock Text="Resume where I stopped" />
+                            </CheckBox>
+                            <CheckBox x:Name="NextBox" Style="{StaticResource K.Toggle}" Margin="0,12,0,0" Click="OnPrefs">
+                                <TextBlock Text="Play the next file in the folder" />
+                            </CheckBox>
+                            <CheckBox x:Name="ClickBox" Style="{StaticResource K.Toggle}" Margin="0,12,0,0" Click="OnPrefs">
+                                <TextBlock Text="Click the video to pause" />
+                            </CheckBox>
+                            <CheckBox x:Name="PreviewBox" Style="{StaticResource K.Toggle}" Margin="0,12,0,0" Click="OnPrefs">
+                                <TextBlock Text="Seek-bar previews" />
+                            </CheckBox>
+                            <CheckBox x:Name="AdminBox" Style="{StaticResource K.Toggle}" Margin="0,12,0,0" Click="OnPrefs">
+                                <StackPanel>
+                                    <TextBlock Text="Run as administrator" />
+                                    <TextBlock Text="Asks once on launch; files you open later go to the same window." Style="{StaticResource K.Caption}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </CheckBox>
+                            <Button Style="{StaticResource K.Button}" Height="36" FontSize="12.5" Content="Make Vyu my video player…" HorizontalAlignment="Left" Margin="0,16,0,0" Click="OnAssociate" />
+                        </StackPanel>
+
+                        <!-- info -->
+                        <StackPanel x:Name="InfoView" Visibility="Collapsed">
+                            <TextBlock Text="NOW PLAYING" Style="{StaticResource PanelHead}" />
+                            <TextBlock x:Name="InfoText" FontFamily="{StaticResource K.FontMono}" FontSize="12" Foreground="{StaticResource K.Text2Brush}" TextWrapping="Wrap" LineHeight="20" />
+                            <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                                <Button Style="{StaticResource K.Button}" Height="34" FontSize="12.5" Content="Screenshot (S)" Click="OnScreenshot" />
+                                <Button Style="{StaticResource K.Button}" Height="34" FontSize="12.5" Content="Show in folder" Margin="6,0,0,0" Click="OnShowInFolder" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- ================= open link dialog ================= -->
+        <Grid x:Name="UrlLayer" Background="#B3000000" Visibility="Collapsed" MouseLeftButtonDown="OnUrlScrim">
+            <Border Width="560" VerticalAlignment="Center" CornerRadius="22" Background="{StaticResource K.Bg2Brush}" BorderBrush="{StaticResource K.Line2Brush}" BorderThickness="1" Padding="24"
+                    MouseLeftButtonDown="OnPanelDown">
+                <StackPanel>
+                    <TextBlock Text="Open a link" Style="{StaticResource K.H2}" />
+                    <TextBlock Text="Direct video links, HLS/DASH streams — and YouTube &amp; friends if yt-dlp is installed." Style="{StaticResource K.Body2}" Margin="0,6,0,0" />
+                    <TextBox x:Name="UrlBox" Style="{StaticResource K.TextBox}" Margin="0,16,0,0" KeyDown="OnUrlKey" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                        <Button Style="{StaticResource K.Button}" Content="Cancel" Click="OnUrlCancel" />
+                        <Button Style="{StaticResource K.Button.Primary}" Content="Play" Margin="10,0,0,0" Click="OnUrlPlay" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ================= keyboard help ================= -->
+        <Grid x:Name="HelpLayer" Background="#B3000000" Visibility="Collapsed" MouseLeftButtonDown="OnHelpClose">
+            <Border Width="620" VerticalAlignment="Center" CornerRadius="22" Background="{StaticResource K.Bg2Brush}" BorderBrush="{StaticResource K.Line2Brush}" BorderThickness="1" Padding="26">
+                <StackPanel>
+                    <TextBlock Text="Shortcuts" Style="{StaticResource K.H2}" />
+                    <TextBlock x:Name="HelpText" FontFamily="{StaticResource K.FontMono}" FontSize="12.5" Foreground="{StaticResource K.Text2Brush}" Margin="0,14,0,0" LineHeight="22" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

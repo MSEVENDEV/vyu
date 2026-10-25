@@ -1,0 +1,14 @@
+<Window x:Class="Vyu.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:v="clr-namespace:Vyu.Views"
+        Title="Vyu" Width="1280" Height="760" MinWidth="480" MinHeight="300"
+        WindowStartupLocation="CenterScreen" Background="Black" WindowStyle="None" ResizeMode="CanResize"
+        Icon="/Assets/vyu.ico">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0" UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
+    <Grid x:Name="Root" Background="Black">
+        <v:VideoHost x:Name="Video" />
+    </Grid>
+</Window>
