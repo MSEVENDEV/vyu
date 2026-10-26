@@ -2,7 +2,9 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <!-- the Windows 10 SDK projection gives Vyu Windows' media controls (media keys + the media flyout) -->
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -13,7 +15,7 @@
     <RootNamespace>Vyu</RootNamespace>
     <ApplicationIcon>Assets\vyu.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Product>Vyu</Product>
     <Company>Vyu</Company>
     <Description>Vyu — the video player that gets out of the way.</Description>
@@ -36,6 +38,9 @@
 
   <ItemGroup>
     <None Include="..\..\deps\mpv\libmpv-2.dll" Link="libmpv-2.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" Condition="Exists('..\..\deps\mpv\libmpv-2.dll')" />
+    <!-- file-type icons Explorer shows for videos and music once Vyu is the default player -->
+    <None Include="Assets\vyu-video.ico" Link="icons\vyu-video.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    <None Include="Assets\vyu-audio.ico" Link="icons\vyu-audio.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
   </ItemGroup>
 
 </Project>

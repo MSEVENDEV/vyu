@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -85,12 +85,11 @@ public partial class ControlsWindow : Window
         NextBox.IsChecked = _s.AutoPlayNext;
         ClickBox.IsChecked = _s.ClickToPause;
         PreviewBox.IsChecked = _s.SeekPreviews;
-        AdminBox.IsChecked = _s.RunAsAdmin;
         (_s.Quality switch { QualityProfile.Fast => QFast, QualityProfile.Cinema => QCin, _ => QBal }).IsChecked = true;
         BuildSpeedChips();
         HelpText.Text = HelpLines;
-        var hypt = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "Hypt");
-        if (Directory.Exists(hypt)) HyptBtn.Visibility = Visibility.Visible;
+        if (HyptClipsFolder() is not null) HyptBtn.Visibility = Visibility.Visible;
+        if (!App.SnapMode && FileAssociations.IsDefaultFor(".mp4")) DefaultCard.Visibility = Visibility.Collapsed;
 
         RefreshHome();
         _tick.Start();
@@ -121,7 +120,46 @@ public partial class ControlsWindow : Window
         }
         DragAcceptFiles(hwnd, true);
         HwndSource.FromHwnd(hwnd)?.AddHook(WndProc);
+        if (!App.SnapMode) HookWindows();
     }
+
+    // ================================================================== Windows integration (like Windows Media Player)
+
+    private MediaControls? _media;
+    private TaskbarButtons? _taskbar;
+
+    private void HookWindows()
+    {
+        _media = MediaControls.TryCreate(_mainHwnd);
+        if (_media is not null)
+        {
+            _media.Pressed += b => Dispatcher.BeginInvoke(() =>
+            {
+                switch (b)
+                {
+                    case "play": if (_paused && !_idle) TogglePause(); break;
+                    case "pause": if (!_paused) TogglePause(); break;
+                    case "next": _mpv.Command("playlist-next"); break;
+                    case "previous": OnPrev(this, new RoutedEventArgs()); break;
+                    case "stop": _mpv.Command("stop"); break;
+                }
+            });
+            _media.SeekRequested += s => Dispatcher.BeginInvoke(() => _mpv.Command("seek", s.ToString(CultureInfo.InvariantCulture), "absolute"));
+        }
+        _taskbar = new TaskbarButtons(_main, () => OnPrev(this, new RoutedEventArgs()), () => { if (!_idle) TogglePause(); }, () => _mpv.Command("playlist-next"));
+        _taskbar.SetEnabled(false, false, false);
+        UpdateJumpList();
+    }
+
+    private void UpdateWindowsState()
+    {
+        _media?.SetState(_idle, _paused);
+        if (!_idle && _title.Length > 0) _media?.SetMedia(_title, _mpv.GetLong("video-params/w") <= 0);
+        _taskbar?.SetPlaying(!_idle && !_paused);
+        _taskbar?.SetEnabled(!_idle, _playlistPos > 0 || _position > 3, _playlistPos < _playlistCount - 1);
+    }
+
+    private void UpdateJumpList() => TaskbarJumpList.Update(_recents.Items.Select(i => (i.Path, i.Title)));
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
@@ -193,6 +231,7 @@ public partial class ControlsWindow : Window
                 PlayGlyph.Text = _paused ? "" : "";
                 PlayGlyph.Margin = _paused ? new Thickness(2, 0, 0, 0) : new Thickness(0);
                 if (_paused) ShowControls();
+                UpdateWindowsState();
                 break;
             case "duration":
                 _duration = value is double d ? d : 0;
@@ -217,6 +256,7 @@ public partial class ControlsWindow : Window
                 _title = value as string ?? "";
                 TitleText.Text = _title.Length > 0 ? _title : "Vyu";
                 _main.Title = _title.Length > 0 ? $"{_title} — Vyu" : "Vyu";
+                UpdateWindowsState();
                 break;
             case "path":
                 _path = value as string;
@@ -227,7 +267,8 @@ public partial class ControlsWindow : Window
                 _idle = value is true;
                 Home.Visibility = _idle ? Visibility.Visible : Visibility.Collapsed;
                 Bottom.Visibility = _idle ? Visibility.Collapsed : Visibility.Visible;
-                if (_idle) { RefreshHome(); TitleText.Text = "Vyu"; MetaText.Text = ""; _main.Title = "Vyu"; ShowControls(); }
+                if (_idle) { RefreshHome(); TitleText.Text = "Vyu"; MetaText.Text = ""; _main.Title = "Vyu"; ShowControls(); UpdateJumpList(); }
+                UpdateWindowsState();
                 break;
             case "track-list/count":
             case "video-params/w":
@@ -261,6 +302,7 @@ public partial class ControlsWindow : Window
     {
         PrevBtn.Opacity = _playlistPos > 0 || _position > 3 ? 1 : 0.35;
         NextBtn.Opacity = _playlistPos < _playlistCount - 1 ? 1 : 0.35;
+        UpdateWindowsState();
         if (_panelOpen && ListView.Visibility == Visibility.Visible) BuildPlaylist();
     }
 
@@ -324,6 +366,7 @@ public partial class ControlsWindow : Window
             if (!_seeking) _position = _mpv.GetDouble("time-pos", _position);
             if (_controlsShown) UpdateSeekVisuals();
             SaveProgress();
+            _media?.SetTimeline(_position, _duration);
         }
         bool overControls = Bottom.IsMouseOver || TopBar.IsMouseOver || Panel.IsMouseOver;
         if (_controlsShown && !_paused && !_idle && !_panelOpen && !_seeking && !overControls && UrlLayer.Visibility != Visibility.Visible
@@ -721,6 +764,13 @@ public partial class ControlsWindow : Window
 
     // ================================================================== opening things
 
+    /// <summary>On the home screen (nothing loaded).</summary>
+    public bool IsIdle => _idle;
+    /// <summary>A video is playing right now.</summary>
+    public bool IsWatching => !_idle && !_paused;
+    /// <summary>A short message over the video (used by the updater).</summary>
+    public void Notify(string text) => ShowOsd("", text);
+
     public void HandleArgs(IEnumerable<string> args)
     {
         var list = args.Where(a => !a.StartsWith("--", StringComparison.Ordinal)).ToList();
@@ -1117,11 +1167,11 @@ public partial class ControlsWindow : Window
     /// <summary>Plays every Hypt clip, newest first (Hypt is Vyu's sibling clip recorder).</summary>
     private void OnHyptClips(object sender, RoutedEventArgs e)
     {
-        var root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "Hypt");
+        var root = HyptClipsFolder();
         List<string> clips;
         try
         {
-            clips = Directory.EnumerateFiles(root, "*.mp4", SearchOption.AllDirectories)
+            clips = root is null ? new List<string>() : Directory.EnumerateFiles(root, "*.mp4", SearchOption.AllDirectories)
                 .Where(f => !Path.GetFileName(f).StartsWith('.'))
                 .OrderByDescending(File.GetLastWriteTimeUtc).Take(200).ToList();
         }
@@ -1236,19 +1286,76 @@ public partial class ControlsWindow : Window
         _s.AutoPlayNext = NextBox.IsChecked == true;
         _s.ClickToPause = ClickBox.IsChecked == true;
         _s.SeekPreviews = PreviewBox.IsChecked == true;
-        _s.RunAsAdmin = AdminBox.IsChecked == true;
         _mpv.SetString("keep-open", _s.AutoPlayNext ? "yes" : "always");
         _s.Save();
     }
-    private void OnAssociate(object sender, RoutedEventArgs e)
+    private void OnAssociate(object sender, RoutedEventArgs e) => OnMakeDefault(sender, e);
+
+    private async void OnCheckUpdates(object sender, RoutedEventArgs e)
+    {
+        UpdateCheckBtn.IsEnabled = false;
+        UpdateCheckBtn.Content = "Checking…";
+        bool found = await ((App)Application.Current).CheckForUpdatesAsync(manual: true);
+        if (found) ClosePanel();
+        else ShowOsd("", $"Vyu {typeof(App).Assembly.GetName().Version?.ToString(3)} is the latest version");
+        UpdateCheckBtn.Content = "Check for updates";
+        UpdateCheckBtn.IsEnabled = true;
+    }
+
+    private DispatcherTimer? _defaultWatch;
+    private DateTime _defaultWatchUntil;
+
+    /// <summary>
+    /// Windows only lets the user choose the default player, so: register Vyu's file types (per user, no admin),
+    /// open Vyu's page in Settings → Default apps, and watch for the moment .mp4 switches to Vyu.
+    /// </summary>
+    private void OnMakeDefault(object sender, RoutedEventArgs e)
+    {
+        try { FileAssociations.Register(); }
+        catch (Exception ex) { ShowOsd("", "Couldn't register: " + ex.Message); return; }
+        if (FileAssociations.IsDefaultFor(".mp4")) { ShowDefaultDone(); return; }
+        FileAssociations.OpenDefaultAppsSettings();
+        DefaultCard.Visibility = Visibility.Visible;
+        DefaultTitle.Text = "Almost there — choose Vyu in Settings";
+        DefaultBody.Text = "Settings → Default apps opened on Vyu. Press “Set default” if you see it, or pick Vyu for .mp4 (and any other types). This card updates by itself.";
+        DefaultBtn.Content = "Open Settings again";
+        _defaultWatchUntil = DateTime.UtcNow.AddMinutes(5);
+        _defaultWatch ??= new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) =>
+        {
+            if (FileAssociations.IsDefaultFor(".mp4")) { _defaultWatch!.Stop(); ShowDefaultDone(); }
+            else if (DateTime.UtcNow > _defaultWatchUntil) _defaultWatch!.Stop();
+        }, Dispatcher);
+        _defaultWatch.Start();
+    }
+
+    private void ShowDefaultDone()
+    {
+        DefaultCard.Visibility = Visibility.Visible;
+        DefaultIcon.Text = "";
+        DefaultIcon.Foreground = Brushes.White;
+        DefaultIconHost.Background = (Brush)FindResource("K.AccentGradient");
+        DefaultTitle.Text = "Vyu is your default player";
+        DefaultBody.Text = "Videos you double-click open here now. You can change it any time in Settings → Default apps.";
+        DefaultBtn.Visibility = Visibility.Collapsed;
+        ShowOsd("", "Vyu is now your default player");
+    }
+
+    /// <summary>Hypt's clips folder (it can be an NVIDIA folder), read from Hypt's settings.</summary>
+    private static string? HyptClipsFolder()
     {
         try
         {
-            FileAssociations.Register();
-            ShowOsd("", "Vyu registered — pick it in Default apps");
-            FileAssociations.OpenDefaultAppsSettings();
+            var settings = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Hypt", "settings.json");
+            if (File.Exists(settings))
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(settings));
+                if (doc.RootElement.TryGetProperty("Storage", out var st) && st.TryGetProperty("ClipsFolder", out var f) && f.GetString() is { } dir && Directory.Exists(dir))
+                    return dir;
+            }
         }
-        catch (Exception ex) { ShowOsd("", "Couldn't register: " + ex.Message); }
+        catch { }
+        var fallback = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "Hypt");
+        return Directory.Exists(fallback) ? fallback : null;
     }
     private void OnAddFiles(object sender, RoutedEventArgs e)
     {

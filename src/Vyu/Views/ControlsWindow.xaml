@@ -82,6 +82,28 @@
                         </Button>
                     </StackPanel>
 
+                    <!-- default player: one click to make double-clicked videos open in Vyu -->
+                    <Border x:Name="DefaultCard" HorizontalAlignment="Center" Margin="0,26,0,0" Padding="16,14,14,14" CornerRadius="18"
+                            Background="#12FFFFFF" BorderBrush="#24FFFFFF" BorderThickness="1" k:Motion.Enter="True" k:Motion.Delay="180">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="DefaultIconHost" Width="42" Height="42" CornerRadius="13" Background="{StaticResource K.AccentSoftBrush}" VerticalAlignment="Center">
+                                <TextBlock x:Name="DefaultIcon" Text="&#xE8A5;" Style="{StaticResource K.Icon}" FontSize="17" Foreground="#C9A8FF" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="14,0,18,0" VerticalAlignment="Center" MaxWidth="440">
+                                <TextBlock x:Name="DefaultTitle" Text="Make Vyu your default player" FontWeight="SemiBold" FontSize="14.5" Foreground="{StaticResource K.Text1Brush}" />
+                                <TextBlock x:Name="DefaultBody" Style="{StaticResource K.Caption}" TextWrapping="Wrap" Margin="0,3,0,0"
+                                           Text="Double-click any video and it opens here instead of Windows Media Player — no permission prompts." />
+                            </StackPanel>
+                            <Button x:Name="DefaultBtn" Grid.Column="2" Style="{StaticResource K.Button.Primary}" Height="40" Padding="18,0" VerticalAlignment="Center"
+                                    Content="Make default" Click="OnMakeDefault" />
+                        </Grid>
+                    </Border>
+
                     <TextBlock x:Name="RecentHead" Text="CONTINUE WATCHING" Style="{StaticResource K.Overline}" Margin="6,46,0,12" />
                     <ItemsControl x:Name="RecentList">
                         <ItemsControl.ItemsPanel>
@@ -372,13 +394,8 @@
                             <CheckBox x:Name="PreviewBox" Style="{StaticResource K.Toggle}" Margin="0,12,0,0" Click="OnPrefs">
                                 <TextBlock Text="Seek-bar previews" />
                             </CheckBox>
-                            <CheckBox x:Name="AdminBox" Style="{StaticResource K.Toggle}" Margin="0,12,0,0" Click="OnPrefs">
-                                <StackPanel>
-                                    <TextBlock Text="Run as administrator" />
-                                    <TextBlock Text="Asks once on launch; files you open later go to the same window." Style="{StaticResource K.Caption}" TextWrapping="Wrap" />
-                                </StackPanel>
-                            </CheckBox>
-                            <Button Style="{StaticResource K.Button}" Height="36" FontSize="12.5" Content="Make Vyu my video player…" HorizontalAlignment="Left" Margin="0,16,0,0" Click="OnAssociate" />
+                            <Button Style="{StaticResource K.Button}" Height="36" FontSize="12.5" Content="Make Vyu my default player…" HorizontalAlignment="Left" Margin="0,16,0,0" Click="OnAssociate" />
+                            <Button x:Name="UpdateCheckBtn" Style="{StaticResource K.Button}" Height="36" FontSize="12.5" Content="Check for updates" HorizontalAlignment="Left" Margin="0,8,0,0" Click="OnCheckUpdates" />
                         </StackPanel>
 
                         <!-- info -->

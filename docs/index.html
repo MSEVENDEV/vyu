@@ -147,7 +147,7 @@ footer a:hover{color:var(--t1)}
       <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><rect x="12" y="11" width="8" height="7" rx="1.5" fill="currentColor" opacity=".35"/></svg></div><h3 data-i="f6.t">Picture-in-picture</h3><p data-i="f6.d">One key shrinks Vyu into a floating window that stays on top. Keep-on-top, full screen and drag-anywhere included.</p></div>
       <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></div><h3 data-i="f7.t">Tune the picture</h3><p data-i="f7.d">Brightness, contrast, saturation, gamma, aspect, rotate, zoom-to-fill — plus Battery, Balanced and Cinema quality modes.</p></div>
       <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></div><h3 data-i="f8.t">Night mode</h3><p data-i="f8.d">Evens out explosions and whispers so you can watch late without riding the volume.</p></div>
-      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg></div><h3 data-i="f9.t">One window, one prompt</h3><p data-i="f9.d">Runs as administrator (asks once). Files you open later join the same window — no second instance, no second prompt.</p></div>
+      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><h3 data-i="f9.t">Default player &amp; Windows flyout</h3><p data-i="f9.d">No admin prompt ever. One click makes Vyu your default player with native media keys, Windows flyout with seekbar, taskbar previews, and automatic updates.</p></div>
     </div>
   </div>
 </section>
@@ -195,7 +195,7 @@ footer a:hover{color:var(--t1)}
           <tr><td data-i="cmp.r4">Resume every file + auto next episode</td><td class="us y">✓</td><td class="n">partial</td><td class="n">config</td><td class="n">partial</td></tr>
           <tr><td data-i="cmp.r5">High-quality scaling (EWA, debanding)</td><td class="us y">✓</td><td class="n">–</td><td class="y">✓</td><td class="n">–</td></tr>
           <tr><td data-i="cmp.r6">Picture-in-picture &amp; keep on top</td><td class="us y">✓</td><td class="n">partial</td><td class="n">config</td><td class="y">✓</td></tr>
-          <tr><td data-i="cmp.r7">Drag &amp; drop while running as admin</td><td class="us y">✓</td><td class="n">–</td><td class="n">–</td><td class="n">–</td></tr>
+          <tr><td data-i="cmp.r7">Media keys &amp; Windows media flyout, any window in front</td><td class="us y">✓</td><td class="n">–</td><td class="n">–</td><td class="n">–</td></tr>
           <tr><td data-i="cmp.r8">Open source</td><td class="us y">GPL</td><td class="y">GPL</td><td class="y">GPL</td><td class="n">–</td></tr>
         </tbody>
       </table>
@@ -241,12 +241,12 @@ const AR={
  "f6.t":"صورة داخل صورة","f6.d":"زر واحد يصغّر فيو لنافذة عائمة فوق كل شيء. وفيه ملء الشاشة والسحب من أي مكان.",
  "f7.t":"اضبط الصورة","f7.d":"سطوع، تباين، تشبع، جاما، نسبة العرض، تدوير، تكبير — وثلاث أوضاع جودة: توفير، متوازن، سينما.",
  "f8.t":"الوضع الليلي","f8.d":"يوازن بين الانفجارات والهمس عشان تتفرج آخر الليل بدون ما تلعب بالصوت.",
- "f9.t":"نافذة وحدة وطلب صلاحية واحد","f9.d":"يشتغل كمسؤول (يسأل مرة وحدة). الملفات اللي تفتحها بعدين تروح لنفس النافذة.",
+ "f9.t":"مشغّلك الافتراضي بدون أي أذونات","f9.d":"بدون أي طلب صلاحيات مسؤول أبداً. ضغطة وحدة تخليه مشغّلك الافتراضي مع دعم أزرار الوسائط وشريط ويندوز المنبثق وأزرار شريط المهام والتحديث التلقائي.",
  "seek.ov":"معاينة التقديم","seek.h":"لاقِ المشهد <span class='gt'>قبل لا تضغط.</span>","seek.sub":"مرّر الماوس على أي مكان في الشريط: فيو يعرض الإطار والوقت والفصل. اسحب للتقديم المباشر، واترك للقفز الدقيق.",
  "keys.ov":"الاختصارات","keys.h":"كيبوردك يعرفه من قبل.","keys.sub":"J K L مثل يوتيوب، الأسهم مثل VLC، وحركات جديدة. اضغط ? داخل فيو للقائمة كاملة.",
- "look.c1":"الرئيسية — اسحب فيديو، افتح مجلد أو رابط، كمّل المشاهدة.","look.c2":"الضبط — السرعة، الصورة، الوضع الليلي والجودة.",
- "cmp.ov":"مقارنة","cmp.h":"فيو مقارنة بالكلاسيكيين","cmp.r1":"يشغّل MKV و HEVC و AV1 و HDR و ASS/PGS","cmp.r2":"واجهة حديثة بحركات","cmp.r3":"معاينة صور على شريط التقديم","cmp.r4":"يكمل كل ملف + الحلقة التالية","cmp.r5":"تكبير بجودة عالية","cmp.r6":"صورة داخل صورة وفوق النوافذ","cmp.r7":"سحب وإفلات وهو يشتغل كمسؤول","cmp.r8":"مفتوح المصدر",
- "end.h":"أفلامك تستاهل أحسن.","end.sub":"فك الضغط، شغّل، واسحب الملف. وتقدر تخليه المشغّل الافتراضي من الضبط ← «Make Vyu my video player».",
+ "look.c1":"الرئيسية — اسحب فيديو، افتح مجلد أو رابط، كمّل المشاهدة، أو خليه مشغّلك الافتراضي بضغطة.","look.c2":"الضبط — السرعة، الصورة، الوضع الليلي والجودة.",
+ "cmp.ov":"مقارنة","cmp.h":"فيو مقارنة بالكلاسيكيين","cmp.r1":"يشغّل MKV و HEVC و AV1 و HDR و ASS/PGS","cmp.r2":"واجهة حديثة بحركات","cmp.r3":"معاينة صور على شريط التقديم","cmp.r4":"يكمل كل ملف + الحلقة التالية","cmp.r5":"تكبير بجودة عالية","cmp.r6":"صورة داخل صورة وفوق النوافذ","cmp.r7":"أزرار الوسائط ولوحة ويندوز حتى لو نافذة ثانية قدام","cmp.r8":"مفتوح المصدر",
+ "end.h":"أفلامك تستاهل أحسن.","end.sub":"فك الضغط، شغّل، واسحب الملف. وتقدر تخليه المشغّل الافتراضي بضغطة زر من الرئيسية — بدون أي أذونات مسؤول وتحديثاته تلقائية.",
  "sib.t":"تعرّف على Hypt، أخو فيو","sib.d":"مسجّل لقطات الألعاب الخفيف. قول «Hypt, clip that» — ولقطاتك تفتح هنا في فيو.","foot.mpv":"يعمل بمحرّك mpv"
 };
 const EN={};document.querySelectorAll('[data-i]').forEach(el=>EN[el.dataset.i]=el.innerHTML);

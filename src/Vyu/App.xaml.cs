@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Vyu.Mpv;
 using Vyu.Services;
 using Vyu.Views;
@@ -20,32 +21,34 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        // started by an update: let the old version finish exiting first, and don't treat the flags as files
+        Updater.WaitForPreviousInstance(e.Args);
         var raw = e.Args.ToList();
+        bool updated = raw.Remove("--updated");
+        int waitAt = raw.IndexOf("--wait-pid");
+        if (waitAt >= 0) raw.RemoveRange(waitAt, Math.Min(2, raw.Count - waitAt));
         int snapAt = raw.FindIndex(a => a.Equals("--snap", StringComparison.OrdinalIgnoreCase));
         string? snapDir = snapAt >= 0 && snapAt + 1 < raw.Count ? raw[snapAt + 1] : null;
         string? snapFile = snapAt >= 0 && snapAt + 2 < raw.Count ? raw[snapAt + 2] : null;
         SnapMode = snapDir is not null;
-        bool cameElevated = raw.Remove("--elevated");
+        raw.RemoveAll(a => a is "--elevated" or "--no-elevate"); // flags from Vyu 1.0 shortcuts
         var args = SnapMode ? new List<string>() : raw;
 
         DispatcherUnhandledException += (_, ex) => { Log("UI: " + ex.Exception); ex.Handled = true; };
 
         if (!SnapMode)
         {
-            // 1) a Vyu is already open → give it the files, no second window, no UAC prompt
+            // a Vyu is already open → give it the files, no second window
             if (SingleInstance.AnotherIsRunning() && SingleInstance.Forward(args.ToArray())) { Shutdown(); return; }
             _settings = VyuSettings.Load();
-            // 2) ask for administrator once, as configured
-            if (_settings.RunAsAdmin && !Elevation.IsElevated && !cameElevated && !args.Contains("--no-elevate"))
-            {
-                if (Elevation.RelaunchElevated(args.ToArray())) { Shutdown(); return; }
-            }
             _single = new SingleInstance();
             _single.Listen(a => Dispatcher.BeginInvoke(() => _controls?.HandleArgs(a)));
+            // after an update or a move, keep "open with Vyu" pointing at this Vyu.exe
+            try { FileAssociations.RefreshIfMoved(); } catch (Exception ex) { Log("Associations: " + ex.Message); }
         }
         else
         {
-            _settings = new VyuSettings { RunAsAdmin = false };
+            _settings = new VyuSettings();
         }
         _recents = SnapMode ? new Recents() : Recents.Load();
 
@@ -96,6 +99,40 @@ public partial class App : Application
 
         if (SnapMode) { await Snapshots.RunAsync(main, _controls, _mpv, snapDir!, snapFile); Shutdown(); return; }
         if (args.Count > 0) _controls.HandleArgs(args);
+
+        var controls = _controls;
+        Updates = new UpdateService { IsWatching = () => controls.IsWatching };
+        Updates.CleanUp();
+        if (updated) controls.Notify($"Updated to Vyu {Updates.Current.ToString(3)}");
+        _ = CheckForUpdatesAsync(manual: false);
+    }
+
+    // ------------------------------------------------------------------ updates
+
+    public static UpdateService? Updates { get; private set; }
+    private UpdateWindow? _updateWindow;
+    private DispatcherTimer? _updateWait;
+
+    /// <summary>Checks GitHub and shows the update pop-up — right away on the home screen, or once the video ends.</summary>
+    public async Task<bool> CheckForUpdatesAsync(bool manual)
+    {
+        if (Updates is null || _controls is null || (!manual && !_settings.CheckForUpdates)) return false;
+        if (!manual) await Task.Delay(TimeSpan.FromSeconds(3));
+        if (Updates.Schedule != UpdateSchedule.None) return true;
+        var info = await Updates.CheckAsync();
+        if (info is null) return false;
+        if (!manual && _settings.UpdateSnoozedVersion == info.Tag && _settings.UpdateSnoozedUntil > DateTime.Now) return true;
+        _updateWait ??= new DispatcherTimer(TimeSpan.FromSeconds(1.5), DispatcherPriority.Background, (_, _) =>
+        {
+            // never on top of a video you're watching
+            if (_controls is null || !_controls.IsIdle || _updateWindow is not null || Updates.Available is not { } u) return;
+            _updateWait!.Stop();
+            _updateWindow = new UpdateWindow(Updates, u, Updates.Current, _settings, _controls.Notify) { Owner = MainWindow };
+            _updateWindow.Closed += (_, _) => _updateWindow = null;
+            _updateWindow.Show();
+        }, Dispatcher);
+        _updateWait.Start();
+        return true;
     }
 
     public static Dictionary<string, string> BuildOptions(VyuSettings s)
@@ -186,6 +223,7 @@ public partial class App : Application
         _recents.Save();
         _mpv?.Dispose();
         _single?.Dispose();
+        Updates?.OnExit(); // installs a scheduled or "now" update, restarting if asked
         base.OnExit(e);
     }
 }
@@ -198,6 +236,16 @@ internal static class Snapshots
         Directory.CreateDirectory(outDir);
         await Task.Delay(1500);
         Save(controls, Path.Combine(outDir, "vyu-home.png"));
+
+        var sample = new UpdateInfo(new Version(1, 2, 0), "v1.2.0", "Vyu 1.2.0",
+            "## What's new\n- **Make Vyu your default player** in one click\n- No more permission prompt when a video opens\n- Media keys and the Windows media flyout work like Media Player\n- Update pop-up: Later, Schedule or Update now",
+            "", 113_000_000, null, "");
+        var update = new UpdateWindow(null, sample, new Version(1, 1, 0), new VyuSettings(), _ => { })
+            { ShowActivated = false, ShowInTaskbar = false, WindowStartupLocation = WindowStartupLocation.Manual, Left = -30000, Top = 0 };
+        update.Show();
+        await Task.Delay(900);
+        Save(update, Path.Combine(outDir, "vyu-update.png"));
+        update.Close();
         if (file is null) return;
 
         // the native video surface can't be captured off-screen, so grab a real frame with the software renderer

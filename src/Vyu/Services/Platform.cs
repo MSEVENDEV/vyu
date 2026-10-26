@@ -81,38 +81,12 @@ public sealed class SingleInstance : IDisposable
     }
 }
 
-public static class Elevation
-{
-    public static bool IsElevated
-    {
-        get
-        {
-            using var id = WindowsIdentity.GetCurrent();
-            return new WindowsPrincipal(id).IsInRole(WindowsBuiltInRole.Administrator);
-        }
-    }
-
-    /// <summary>Restarts Vyu through UAC. Returns false if the user said no (Vyu then just runs normally).</summary>
-    public static bool RelaunchElevated(string[] args)
-    {
-        try
-        {
-            var psi = new ProcessStartInfo(Environment.ProcessPath!)
-            {
-                UseShellExecute = true,
-                Verb = "runas",
-                Arguments = string.Join(" ", args.Select(a => $"\"{a.Replace("\"", "\\\"")}\"").Append("--elevated")),
-                WorkingDirectory = Environment.CurrentDirectory,
-            };
-            Process.Start(psi);
-            return true;
-        }
-        catch (Win32Exception ex) when (ex.NativeErrorCode == 1223) { return false; } // cancelled
-        catch { return false; }
-    }
-}
-
-/// <summary>Registers Vyu as a video player (per user). Windows then lets you pick it in Default apps.</summary>
+/// <summary>
+/// Registers Vyu as a media player for this user (no administrator needed) the way Windows' own players do:
+/// one file type per extension ("MP4 Video", "MKV Video"…) with a document-style icon, so once Vyu is the default
+/// your files still look like normal video files (with their thumbnails), not like a wall of app logos.
+/// Windows only lets the user pick the default, so <see cref="OpenDefaultAppsSettings"/> takes them to Vyu's page.
+/// </summary>
 public static class FileAssociations
 {
     public static readonly string[] VideoExtensions =
@@ -122,50 +96,90 @@ public static class FileAssociations
     };
     public static readonly string[] AudioExtensions = { ".mp3", ".flac", ".m4a", ".aac", ".ogg", ".opus", ".wav", ".wma", ".alac", ".ape" };
 
+    public const string ProgIdPrefix = "Vyu.";
+    public static string ProgId(string ext) => ProgIdPrefix + ext.TrimStart('.').ToUpperInvariant();
+
+    private static string Exe => Environment.ProcessPath!;
+    private static string IconFor(bool audio) => Path.Combine(AppContext.BaseDirectory, "icons", audio ? "vyu-audio.ico" : "vyu-video.ico");
+
     public static void Register()
     {
-        var exe = Environment.ProcessPath!;
+        var exe = Exe;
         var cmd = $"\"{exe}\" \"%1\"";
+        var all = VideoExtensions.Select(e => (e, audio: false)).Concat(AudioExtensions.Select(e => (e, audio: true))).ToList();
         using (var app = Registry.CurrentUser.CreateSubKey(@"Software\Classes\Applications\Vyu.exe"))
         {
             app.SetValue("FriendlyAppName", "Vyu");
             using (var c = app.CreateSubKey(@"shell\open\command")) c.SetValue(null, cmd);
             using var types = app.CreateSubKey("SupportedTypes");
-            foreach (var e in VideoExtensions.Concat(AudioExtensions)) types.SetValue(e, "");
+            foreach (var (e, _) in all) types.SetValue(e, "");
         }
-        using (var prog = Registry.CurrentUser.CreateSubKey(@"Software\Classes\Vyu.Media"))
+        foreach (var (e, audio) in all)
         {
-            prog.SetValue(null, "Video (Vyu)");
-            using (var icon = prog.CreateSubKey("DefaultIcon")) icon.SetValue(null, $"\"{exe}\",0");
-            using (var c = prog.CreateSubKey(@"shell\open\command")) c.SetValue(null, cmd);
+            using var prog = Registry.CurrentUser.CreateSubKey($@"Software\Classes\{ProgId(e)}");
+            var label = $"{e.TrimStart('.').ToUpperInvariant()} {(audio ? "Audio" : "Video")}";
+            prog.SetValue(null, label);
+            prog.SetValue("FriendlyTypeName", label);
+            var icon = IconFor(audio);
+            using (var i = prog.CreateSubKey("DefaultIcon")) i.SetValue(null, File.Exists(icon) ? $"\"{icon}\",0" : $"\"{exe}\",0");
+            using (var shell = prog.CreateSubKey("shell")) shell.SetValue(null, "open");
+            using (var open = prog.CreateSubKey(@"shell\open"))
+            {
+                open.SetValue(null, "Play with Vyu");
+                open.SetValue("Icon", $"\"{exe}\",0");
+                using var c = open.CreateSubKey("command");
+                c.SetValue(null, cmd);
+            }
         }
         using (var cap = Registry.CurrentUser.CreateSubKey(@"Software\Vyu\Capabilities"))
         {
             cap.SetValue("ApplicationName", "Vyu");
-            cap.SetValue("ApplicationDescription", "Fast, beautiful video player powered by mpv.");
+            cap.SetValue("ApplicationIcon", $"\"{exe}\",0");
+            cap.SetValue("ApplicationDescription", "Plays every video and music file. Fast, simple, powered by mpv.");
             using var fa = cap.CreateSubKey("FileAssociations");
-            foreach (var e in VideoExtensions.Concat(AudioExtensions))
+            foreach (var (e, _) in all)
             {
-                fa.SetValue(e, "Vyu.Media");
+                fa.SetValue(e, ProgId(e));
                 using var ow = Registry.CurrentUser.CreateSubKey($@"Software\Classes\{e}\OpenWithProgids");
-                ow.SetValue("Vyu.Media", Array.Empty<byte>(), RegistryValueKind.None);
+                ow.SetValue(ProgId(e), Array.Empty<byte>(), RegistryValueKind.None);
+                try { ow.DeleteValue("Vyu.Media", false); } catch { } // the single type Vyu 1.0 used
             }
         }
         using (var reg = Registry.CurrentUser.CreateSubKey(@"Software\RegisteredApplications"))
             reg.SetValue("Vyu", @"Software\Vyu\Capabilities");
-        SHChangeNotify(0x08000000, 0, IntPtr.Zero, IntPtr.Zero); // SHCNE_ASSOCCHANGED
+        SHChangeNotify(0x08000000, 0, IntPtr.Zero, IntPtr.Zero); // SHCNE_ASSOCCHANGED: Explorer refreshes icons
     }
 
     public static bool IsRegistered()
     {
         using var k = Registry.CurrentUser.OpenSubKey(@"Software\Classes\Applications\Vyu.exe\shell\open\command");
-        return k?.GetValue(null) is string s && s.Contains(Environment.ProcessPath!, StringComparison.OrdinalIgnoreCase);
+        return k?.GetValue(null) is string s && s.Contains(Exe, StringComparison.OrdinalIgnoreCase);
     }
+
+    /// <summary>Vyu was registered from another folder (moved, or an older install): point everything at this exe.</summary>
+    public static void RefreshIfMoved()
+    {
+        using var k = Registry.CurrentUser.OpenSubKey(@"Software\Classes\Applications\Vyu.exe\shell\open\command");
+        if (k?.GetValue(null) is string s && !s.Contains(Exe, StringComparison.OrdinalIgnoreCase)) Register();
+        else if (k is not null && Registry.CurrentUser.OpenSubKey($@"Software\Classes\{ProgId(".mp4")}") is null) Register(); // 1.0 → per-type
+    }
+
+    /// <summary>The program Windows opens this extension with (the user's choice in Default apps), as a ProgID.</summary>
+    public static string? DefaultProgId(string ext)
+    {
+        using var k = Registry.CurrentUser.OpenSubKey($@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\{ext}\UserChoice");
+        return k?.GetValue("ProgId") as string;
+    }
+
+    public static bool IsDefaultFor(string ext) =>
+        DefaultProgId(ext) is { } p && (p.StartsWith(ProgIdPrefix, StringComparison.OrdinalIgnoreCase) || p.Equals("Applications\\Vyu.exe", StringComparison.OrdinalIgnoreCase));
 
     public static void OpenDefaultAppsSettings()
     {
+        // Windows 11 opens Vyu's own page in Default apps; if that link isn't understood, the Default apps list
+        // opens instead, where Vyu is now listed
         try { Process.Start(new ProcessStartInfo("ms-settings:defaultapps?registeredAppUser=Vyu") { UseShellExecute = true }); }
-        catch { }
+        catch { try { Process.Start(new ProcessStartInfo("ms-settings:defaultapps") { UseShellExecute = true }); } catch { } }
     }
 
     [System.Runtime.InteropServices.DllImport("shell32.dll")]

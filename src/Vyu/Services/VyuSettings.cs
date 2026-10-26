@@ -15,7 +15,6 @@ public sealed class VyuSettings : INotifyPropertyChanged
     private bool _resume = true;
     private bool _autoNext = true;
     private bool _clickPause = true;
-    private bool _runAsAdmin = true;
     private bool _nightMode;
     private double _subScale = 1.0;
     private string _audioLang = "";
@@ -32,8 +31,8 @@ public sealed class VyuSettings : INotifyPropertyChanged
     public bool ResumePlayback { get => _resume; set => Set(ref _resume, value); }
     public bool AutoPlayNext { get => _autoNext; set => Set(ref _autoNext, value); }
     public bool ClickToPause { get => _clickPause; set => Set(ref _clickPause, value); }
-    /// <summary>Ask for administrator (UAC) when Vyu starts. Already-running Vyu takes new files without asking.</summary>
-    public bool RunAsAdmin { get => _runAsAdmin; set => Set(ref _runAsAdmin, value); }
+    // (Vyu 1.0 had "RunAsAdmin": it made Windows ask for permission every time a video opened. A player never
+    // needs administrator rights, so it's gone; an old settings file's value is simply ignored.)
     /// <summary>Evens out loud explosions and quiet dialogue (dynamic range compression).</summary>
     public bool NightMode { get => _nightMode; set => Set(ref _nightMode, value); }
     public double SubtitleScale { get => _subScale; set => Set(ref _subScale, Math.Clamp(value, 0.5, 2.5)); }
@@ -42,6 +41,11 @@ public sealed class VyuSettings : INotifyPropertyChanged
     public bool AutoLoadSubtitles { get => _subsAuto; set => Set(ref _subsAuto, value); }
     public int SeekStep { get => _seekStep; set => Set(ref _seekStep, Math.Clamp(value, 1, 60)); }
     public bool SeekPreviews { get => _thumbnails; set => Set(ref _thumbnails, value); }
+    /// <summary>Look for a new Vyu on GitHub at start-up and offer it in a pop-up.</summary>
+    public bool CheckForUpdates { get; set; } = true;
+    /// <summary>"Later" on the update pop-up: don't ask again about this version until then.</summary>
+    public DateTime? UpdateSnoozedUntil { get; set; }
+    public string? UpdateSnoozedVersion { get; set; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
     private void Set<T>(ref T field, T value, [CallerMemberName] string? name = null)

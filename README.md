@@ -30,11 +30,16 @@ VLC plays everything but looks like 2006. mpv plays everything *beautifully* but
 - **Picture tuning**: brightness, contrast, saturation, gamma, aspect, rotate, zoom-to-fill.
   Three quality modes: *Battery*, *Balanced*, *Cinema* (EWA-Lanczos scaling + debanding).
 - **Night mode** evens out loud explosions and quiet dialogue.
-- **Picture-in-picture** and **keep on top**, drag-and-drop anywhere (even when running as admin),
+- **Picture-in-picture** and **keep on top**, drag-and-drop anywhere,
   paste a file or link with `Ctrl+V`, YouTube-style `J K L` keys, mouse-wheel volume up to 150 %.
 - **One window.** Opening another file while Vyu is open sends it to the same window.
-- **Runs as administrator** by default (asks once on launch — turn it off in *Tune → Run as administrator*).
-  Files you open afterwards go to the running Vyu without another prompt.
+- **Your default player in one click.** *Make default* on the home screen opens Vyu's page in Windows'
+  Default apps and confirms when it's done. Your files keep Windows-style icons (“MP4 Video”) and thumbnails.
+  No permission prompts — Vyu never asks for administrator.
+- **Works like Windows' own player.** Media keys and the Windows media flyout (with a seek bar) control Vyu
+  even when another window is in front; previous / play / next sit under the taskbar thumbnail; right-click
+  Vyu on the taskbar for what you were watching.
+- **Updates.** A pop-up offers **Later**, **Schedule** or **Update now & restart** — never over a video you're watching.
 - **Your Hypt clips one click away** — Vyu is the sibling of [Hypt](https://github.com/MSEVENDEV/hypt), the voice-controlled clipper.
 - Power users: drop an `mpv.conf` into `%APPDATA%\Vyu\mpv`.
 
